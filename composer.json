@@ -1,5 +1,5 @@
 {
-    "name": "tafer/laravel-platform",
+    "name": "tafer-mx/laravel-platform",
     "description": "Shared logic for Tafer Laravel projects",
     "version": "0.0.1",
     "type": "library",
