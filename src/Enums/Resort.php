@@ -52,7 +52,6 @@
                     new ResortRegion(Location::Cancun, 'GBCN'),
                     new ResortRegion(Location::PuertoVallarta, 'GBPV'),
                     new ResortRegion(Location::Cabo, 'GBLC'),
-                    new ResortRegion(Location::PuertoVallarta, 'SNCTRY'),
                 ],
 
                 self::HotelMousai => [
