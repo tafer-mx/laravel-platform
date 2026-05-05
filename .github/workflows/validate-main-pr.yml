@@ -12,7 +12,7 @@ jobs:
       - name: Validate PR source branch
         run: |
           if [ "${{ github.head_ref }}" != "dev" ]; then
-           echo "❌ PRs to main are only allowed from the 'dev' branch."
+            echo "❌ PRs to main are only allowed from the 'dev' branch."
             echo "   Current source branch: ${{ github.head_ref }}"
             exit 1
           else
