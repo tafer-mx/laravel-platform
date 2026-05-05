@@ -3,6 +3,7 @@
     namespace TAFER\Core\Enums;
 
     enum Location: string {
+
         //These values are managed by storyblok slug manager, 
         //if any of them change in the cms, then they must to be changed here as well
 
@@ -16,5 +17,37 @@
          */
         function isCorp(): bool {
             return $this === self::Corp;
+        }
+
+        /**
+         * Get the human-readable location name.
+         *
+         * @param Locale $lang Language used to return the label.
+         *
+         * @return string Human-readable location name.
+         */
+        public function label(Locale $lang = Locale::English): string
+        {
+            return match ($this) {
+                self::Cancun => match ($lang) {
+                    Locale::English => 'Cancun',
+                    Locale::Spanish => 'Cancún',
+                },
+
+                self::PuertoVallarta => match ($lang) {
+                    Locale::English,
+                    Locale::Spanish => 'Puerto Vallarta',
+                },
+
+                self::Cabo => match ($lang) {
+                    Locale::English,
+                    Locale::Spanish => 'Los Cabos',
+                },
+
+                self::Corp => match ($lang) {
+                    Locale::English => 'Corporate',
+                    Locale::Spanish => 'Corporativo',
+                },
+            };
         }
     }
