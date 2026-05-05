@@ -1,6 +1,6 @@
 <?php
 
-namespace TAFER\Core\Support\Phones;
+namespace TAFER\Core\Phones;
 
 use TAFER\Core\Contracts\ResortPhoneDirectory;
 use TAFER\Core\Enums\Device;
