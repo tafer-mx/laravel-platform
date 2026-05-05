@@ -50,4 +50,16 @@
                 },
             };
         }
+
+        /**
+         * Create a Location enum from a slug.
+         *
+         * @param string|null $locationSlug Location slug from Storyblok.
+         *
+         * @return self|null Location enum instance, or null if the slug is empty or invalid.
+         */
+        public static function fromSlug(?string $locationSlug): ?self
+        {
+            return $locationSlug ? self::tryFrom($locationSlug) : null;
+        }
     }
