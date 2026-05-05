@@ -11,7 +11,7 @@ use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\PhoneNumber;
 
 /**
- * Phone directory for Hotel Garza Blanca.
+ * Phone directory for Villa Palmar.
  */
 final class VillaPalmarPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
