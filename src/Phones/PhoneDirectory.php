@@ -2,7 +2,6 @@
 
 namespace TAFER\Core\Support\Phones;
 
-use TAFER\Core\Contracts\ResortPhoneDirectory;
 use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
