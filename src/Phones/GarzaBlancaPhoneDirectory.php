@@ -13,7 +13,7 @@ use TAFER\Core\Records\PhoneNumber;
 /**
  * Phone directory for Garza Blanca.
  */
-final class GarzaBlancaPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
+final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
 
     public function resort(): Resort
@@ -89,11 +89,11 @@ final class GarzaBlancaPhoneDirectory extends PhoneDirectory implements ResortPh
                             '+16026716747',
                             '+1 602 671 6747'
                         ),
-                        PhoneSource::Gads->value => [
-                            'url' => '+14806482672',
-                            'button_text' => '+1 480 648 2672'
-                        ]
-                   ]
+                        PhoneSource::Gads->value => new PhoneNumber(
+                            '+14806482672',
+                            '+1 480 648 2672'
+                        )
+                    ]
                 ]
             ],
             Location::PuertoVallarta->value => [

@@ -13,7 +13,7 @@ use TAFER\Core\Records\PhoneNumber;
 /**
  * Phone directory for Villa Palmar.
  */
-final class VillaPalmarPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
+final readonly class VillaPalmarPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
 
     public function resort(): Resort

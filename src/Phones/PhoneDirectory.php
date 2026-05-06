@@ -9,7 +9,7 @@ use TAFER\Core\Enums\PhoneSource;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\PhoneNumber;
 
-abstract class PhoneDirectory
+abstract readonly class PhoneDirectory
 {
     /**
      * Key used to group campaign-specific phone numbers.
