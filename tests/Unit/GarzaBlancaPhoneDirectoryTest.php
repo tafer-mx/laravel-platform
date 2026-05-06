@@ -224,7 +224,7 @@ describe('GBPV Phone Directory', function () {
             expect($phone)
                 ->toBeInstanceOf(PhoneNumber::class)
                 ->and($phone->number)->toBe('+528006490485')
-                ->and($phone->buttonText)->toBe('+52 800 649 0552');
+                ->and($phone->buttonText)->toBe('+52 800 649 0485');
         });
     });
 });

@@ -104,7 +104,7 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                     ),
                     Device::Mobile->value => new PhoneNumber(
                         '+528006490485',
-                        '+52 800 649 0552'
+                        '+52 800 649 0485'
                     )
                 ],
                 Locale::English->value => [
