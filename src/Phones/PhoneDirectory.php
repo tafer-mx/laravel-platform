@@ -24,7 +24,7 @@ abstract class PhoneDirectory
     abstract public function resort(): Resort;
 
     /**
-     * Resolve a Hotel Mousai phone number.
+     * Resolve a phone number.
      *
      * @param Location $location Location used to resolve the phone number.
      * @param Locale $locale Locale used to resolve the phone number.
@@ -55,7 +55,7 @@ abstract class PhoneDirectory
     }
 
     /**
-     * Resolve a default Hotel Mousai phone number by device.
+     * Resolve a default phone number by device.
      *
      * @param Location $location Location used to resolve the phone number.
      * @param Locale $locale Locale used to resolve the phone number.
@@ -77,7 +77,7 @@ abstract class PhoneDirectory
     }
 
     /**
-     * Resolve a campaign-specific Hotel Mousai phone number.
+     * Resolve a campaign-specific phone number.
      *
      * @param Location $location Location used to resolve the phone number.
      * @param Locale $locale Locale used to resolve the phone number.
