@@ -77,7 +77,7 @@
                 return null;
             }
 
-            $raw = $this->client->request('GET', "stories/{$slug}", [
+            $raw = $this->client->request('GET', "/stories/{$slug}", [
                 'query' => [
                     'language'      => $locale->value,
                     'version'       => $version->value,
@@ -91,7 +91,7 @@
 
         private function fetchFull(string $slug, Version $version, Locale $locale): StoryResponse
         {
-            $raw = $this->client->request('GET', "stories/{$slug}", [
+            $raw = $this->client->request('GET', "/stories/{$slug}", [
                 'query' => [
                     'language'          => $locale->value,
                     'version'           => $version->value,
