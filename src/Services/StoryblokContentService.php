@@ -1,6 +1,6 @@
 <?php
 
-    namespace TAFER\Core\Storyblok\Services;
+    namespace TAFER\Core\Services;
 
     use Storyblok\Api\StoryblokClient;
     use Storyblok\Api\StoriesApi;
@@ -12,7 +12,7 @@
     use Storyblok\Api\Domain\Value\Resolver\RelationCollection;
 
     use TAFER\Core\Enums\Locale;
-    use TAFER\Core\Repositories\StoryCacheRepository;
+    use TAFER\Core\Repositories\StoryblokCacheRepository;
 
     //TODO: Validar version draft
     class StoryblokContentService
@@ -21,7 +21,7 @@
 
         public function __construct(
             private readonly StoryblokClient $client,
-            private readonly StoryCacheRepository $cache,
+            private readonly StoryblokCacheRepository $cache,
             private readonly array $resolveReferences = [],
         ) {
             $this->api = new StoriesApi($this->client);

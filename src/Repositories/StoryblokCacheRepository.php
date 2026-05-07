@@ -4,7 +4,7 @@
 
     use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
-    class StoryCacheRepository
+    class StoryblokCacheRepository
     {
         private const CACHE_PREFIX = 'storyblok:slug:';
 
