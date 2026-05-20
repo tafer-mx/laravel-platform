@@ -17,7 +17,7 @@
         "serve": [
             "Composer\\Config::disableProcessTimeout",
             "@build",
-            "@php vendor/bin/testbench serve --ansi"
+            "@php vendor/bin/testbench serve --ansi --port=6969 --host=localhost"
         ]
     },
     "autoload": {

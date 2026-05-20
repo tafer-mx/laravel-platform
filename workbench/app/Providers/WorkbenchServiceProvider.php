@@ -19,8 +19,10 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-         if ($this->app->environment('local')) {
-            // Blast se registra automáticamente vía auto-discovery
-        }
+        $path = function_exists('workbench_path')
+        ? \workbench_path('resources/views')
+        : base_path('workbench/resources/views');
+
+         $this->loadViewsFrom($path, 'workbench');
     }
 }
