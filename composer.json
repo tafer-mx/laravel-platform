@@ -5,7 +5,20 @@
     "license": "proprietary",
     "scripts": {
         "test": "pest",
-        "test:unit": "pest tests/Unit"
+        "test:unit": "pest tests/Unit",
+        "workbench:install": "vendor/bin/testbench workbench:install",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ]
     },
     "autoload": {
         "psr-4": {
@@ -14,7 +27,10 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "require": {
@@ -22,7 +38,8 @@
         "illuminate/support": "^12.0"
     },
     "require-dev": {
-        "pestphp/pest": "^4.7"
+        "pestphp/pest": "^4.7",
+        "orchestra/testbench": "^10.11"
     },
     "config": {
         "allow-plugins": {
