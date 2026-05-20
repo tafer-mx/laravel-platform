@@ -1,0 +1,1 @@
+<h2>Hello, World! {{ $resort->label() }}</h2>

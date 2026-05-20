@@ -48,5 +48,12 @@
         "platform": {
             "php": "8.3.0"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TAFER\\Core\\TAFERServiceProvider"
+            ]
+        }
     }
 }
