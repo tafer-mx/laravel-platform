@@ -1,1 +1,2 @@
-<h2>Hello, World! {{ $resort->label() }}</h2>
+<h2>Hello, World! </h2>
+<x-tafer-phone-directory :resort="$resort" />
