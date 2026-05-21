@@ -2,14 +2,22 @@
 
 namespace TAFER\Core;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use TAFER\Core\Contracts\ReviewClient;
+use TAFER\Core\Services\ReviewsService;
 use TAFER\Core\View\Components\PhoneDirectory;
 class TAFERServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(ReviewClient::class, fn () => new ReviewsService(
+            new Client([
+                'base_uri' => config('tafer.middleware.base_url'),
+                'timeout'  => config('tafer.middleware.reviews.timeout'),
+            ])
+        ));
     }
 
     public function boot(): void
