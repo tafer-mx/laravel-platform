@@ -5,24 +5,43 @@ namespace TAFER\Core\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-
+use Illuminate\Support\Collection;
 use TAFER\Core\Contracts\ReviewClient;
-use TAFER\Core\Records\ResortRegion;
+use TAFER\Core\DTO\ReviewDTO;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
+use TAFER\Core\Records\ResortRegion;
 
-class ReviewsService implements ReviewClient 
+class ReviewsService implements ReviewClient
 {
-
-
     public function __construct(protected Client $client)
     {}
 
-    public function getByHotel(ResortRegion $hotel, Locale $locale): array
+    /**
+     * @return Collection<ReviewDTO>
+     */
+    public function getByHotel(ResortRegion $hotel, Locale $locale): Collection
     {
-        $hotelCode = $hotel->code;
+        return $this->getReviews("code/{$hotel->code}", $locale);
+    }
+
+    /**
+     * @return Collection<ReviewDTO>
+     */
+    public function getByBrand(Resort $resort, Locale $locale): Collection
+    {
+        return $this->getReviews("brand/{$resort->code()}", $locale);
+    }
+
+    /**
+     * Fetch reviews from the given endpoint and map them into DTOs.
+     *
+     * @return Collection<int, ReviewDTO>
+     */
+    private function getReviews(string $endpoint, Locale $locale): Collection
+    {
         try {
-            $response = $this->client->get("code/{$hotelCode}", [
+            $response = $this->client->get($endpoint, [
                 'headers' => [
                     'Accept-Language' => $locale->value,
                 ],
@@ -30,57 +49,38 @@ class ReviewsService implements ReviewClient
                     'language' => $locale->value,
                 ],
             ]);
-            $reviews = json_decode($response->getBody()->getContents(), true);
 
-            return $this->filterFiveStarReviews($reviews);
-        } catch (ClientException $e) {
+            $payload = json_decode($response->getBody()->getContents(), true);
 
-            \Log::warning('Reviews API 4xx', [
-                'status' => $e->getResponse()?->getStatusCode(),
-                'body'   => $e->getResponse()?->getBody()->getContents(),
-            ]);
-            return [];
-
-        } catch (RequestException $e) {
-
-            \Log::error('Reviews API Error: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function getByBrand(Resort $resort, Locale $locale): array
-    {
-        $brandCode = $resort->code();
-        try {
-            $response = $this->client->get("brand/{$brandCode}", [
-                'headers' => [
-                    'Accept-Language' => $locale->value,
-                ],
-                'query' => [
-                    'language' => $locale->value,
-                ],
-            ]);
-            $reviews = json_decode($response->getBody()->getContents(), true);
-            return $this->filterFiveStarReviews($reviews);
+            return collect($this->filterFiveStarReviews($payload['data']))
+                ->map(fn (array $review): ReviewDTO => ReviewDTO::fromArray($review))
+                ->values();
 
         } catch (ClientException $e) {
             \Log::warning('Reviews API 4xx', [
                 'status' => $e->getResponse()?->getStatusCode(),
                 'body'   => $e->getResponse()?->getBody()->getContents(),
             ]);
-            return [];
 
+            return collect();
         } catch (RequestException $e) {
-
             \Log::error('Reviews API Error: ' . $e->getMessage());
-            return [];
+
+            return collect();
         }
     }
 
-    public function filterFiveStarReviews(array $reviews): array
+   
+    /**
+     * Keep only five-star reviews.
+     *
+     * @param array<int, array<string, mixed>> $reviews
+     * @return array<int, array<string, mixed>>
+     */
+    private function filterFiveStarReviews(array $reviews): array
     {
-        return array_filter($reviews, function ($review) {
-            return isset($review['rating']) && $review['rating'] === 5;
-        });
+        return array_values(array_filter($reviews, function (array $review): bool {
+            return isset($review['rating']) && (int) $review['rating'] === 5;
+        }));
     }
 }
