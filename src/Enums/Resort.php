@@ -106,6 +106,22 @@
         }
 
 
+        public static function resortByRegionCode(string $code): ?self
+        {
+             $code = strtoupper(trim($code));
+
+            foreach (self::cases() as $resort) {
+                foreach ($resort->regions() as $region) {
+                    if ($region->code === $code) {
+                        return $resort;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
         public function parent(): ?self
         {
             return match ($this) {
