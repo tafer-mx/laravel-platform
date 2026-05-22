@@ -22,7 +22,7 @@ class TAFERServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'tafer');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'tafer');
 
         // Class Components
         // https://laravel.com/docs/13.x/packages#view-components
