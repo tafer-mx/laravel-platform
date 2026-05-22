@@ -52,7 +52,7 @@ class ReviewsService implements ReviewClient
 
             $payload = json_decode($response->getBody()->getContents(), true);
 
-            return collect($this->filterFiveStarReviews($payload['data']))
+            return collect($this->filterReviews($payload['data']))
                 ->map(fn (array $review): ReviewDTO => ReviewDTO::fromArray($review))
                 ->values();
 
@@ -72,15 +72,14 @@ class ReviewsService implements ReviewClient
 
    
     /**
-     * Keep only five-star reviews.
+     * Keep only five-star and visible reviews.
      *
      * @param array<int, array<string, mixed>> $reviews
      * @return array<int, array<string, mixed>>
      */
-    private function filterFiveStarReviews(array $reviews): array
+    private function filterReviews(array $reviews): array
     {
-        return array_values(array_filter($reviews, function (array $review): bool {
-            return isset($review['rating']) && (int) $review['rating'] === 5;
-        }));
+        return array_values(array_filter($reviews, fn(array $review): bool => (!empty($review['rating']) && $review['rating'] === 5) 
+            && (!empty($review['visibility']) && $review['visibility'] >= 1)));
     }
 }
