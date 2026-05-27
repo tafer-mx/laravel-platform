@@ -34,7 +34,7 @@
         {
             return match ($this) {
                 self::GarzaBlanca => 'GB',
-                self::HotelMousai => 'HM',
+                self::HotelMousai => 'MS',
                 self::VillaPalmarCancun => 'VP',
                 self::Sanctuary => 'SNCTRY',
             };
