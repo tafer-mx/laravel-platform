@@ -12,10 +12,18 @@ use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\ResortRegion;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 class ReviewsService implements ReviewClient
 {
-    public function __construct(protected Client $client)
-    {}
+    public function __construct(
+        protected Client $client,
+        protected ?LoggerInterface $logger = null,
+    
+    )
+    {
+        $this->logger ??= new NullLogger();
+    }
 
     /**
      * @return Collection<ReviewDTO>
@@ -57,14 +65,14 @@ class ReviewsService implements ReviewClient
                 ->values();
 
         } catch (ClientException $e) {
-            \Log::warning('Reviews API 4xx', [
+            $this->logger->warning('Reviews API 4xx', [
                 'status' => $e->getResponse()?->getStatusCode(),
                 'body'   => $e->getResponse()?->getBody()->getContents(),
             ]);
 
             return collect();
         } catch (RequestException $e) {
-            \Log::error('Reviews API Error: ' . $e->getMessage());
+            $this->logger->error('Reviews API Error: ' . $e->getMessage());
 
             return collect();
         }
