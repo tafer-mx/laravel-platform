@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use TAFER\Core\Contracts\ReviewClient;
-use TAFER\Core\DTO\ReviewDTO;
+use TAFER\Core\Dto\ReviewDTO;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\ResortRegion;

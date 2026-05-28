@@ -1,6 +1,6 @@
 <?php
 
-use TAFER\Core\DTO\ReviewDTO;
+use TAFER\Core\Dto\ReviewDTO;
 use TAFER\Core\Enums\Locale;
 use Tests\Support;
 use Tests\Support\Fixture;

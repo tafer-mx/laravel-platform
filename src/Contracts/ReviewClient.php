@@ -3,7 +3,7 @@
 namespace TAFER\Core\Contracts;
 
 use Illuminate\Support\Collection;
-use TAFER\Core\DTO\ReviewDTO;
+use TAFER\Core\Dto\ReviewDTO;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\ResortRegion;

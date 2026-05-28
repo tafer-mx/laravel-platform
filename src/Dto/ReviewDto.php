@@ -1,6 +1,6 @@
 <?php
 
-namespace TAFER\Core\DTO;
+namespace TAFER\Core\Dto;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
