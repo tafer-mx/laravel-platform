@@ -51,6 +51,25 @@
             };
         }
 
+        public function code(): string
+        {
+            return match ($this) {
+                self::Cancun => 'CN',
+                self::PuertoVallarta => 'PV',
+                self::Cabo => 'LC',
+            };
+        }
+
+        public static function fromCode(string $code): ?self
+        {
+            return match ($code) {
+                'CN' => self::Cancun,
+                'PV' => self::PuertoVallarta,
+                'LC' => self::Cabo,
+                default => null,
+            };
+        }
+        
         /**
          * Create a Location enum from a slug.
          *

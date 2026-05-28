@@ -21,3 +21,21 @@
             ->and(Resort::VillaPalmarCancun->hasRegion(Location::Cabo))->toBeFalse()
             ->and(Resort::Sanctuary->hasRegion(Location::PuertoVallarta))->toBeTrue();
     });
+
+    describe('Gets the region by a code', function () {
+        it('GARZA BLANCA (GB)', function () {
+            expect(Resort::resortByRegionCode('GBCN'))->toEqual(Resort::GarzaBlanca)
+                ->and(Resort::resortByRegionCode('GBPV'))->toEqual(Resort::GarzaBlanca)
+                ->and(Resort::resortByRegionCode('SNCTRY'))->toEqual(Resort::Sanctuary)
+                ->and(Resort::resortByRegionCode('CABCODE'))->toBeNull();
+        });
+
+        it('Hotel Mousai (HM)', function () {
+            expect(Resort::resortByRegionCode('MSCN'))->toEqual(Resort::HotelMousai)
+                ->and(Resort::resortByRegionCode('MSPV'))->toEqual(Resort::HotelMousai);
+        });
+
+        it('Villa Palmar Cancun (VP)', function () {
+            expect(Resort::resortByRegionCode('VPCN'))->toEqual(Resort::VillaPalmarCancun);
+        });
+    });
