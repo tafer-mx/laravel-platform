@@ -60,7 +60,7 @@ class ReviewsService implements ReviewClient
 
             $payload = json_decode($response->getBody()->getContents(), true);
 
-            return collect($this->filterReviews($payload['data']))
+            return collect($this->filterReviews($payload['data'] ?? []))
                 ->map(fn (array $review): ReviewDto => ReviewDto::fromArray($review))
                 ->values();
 

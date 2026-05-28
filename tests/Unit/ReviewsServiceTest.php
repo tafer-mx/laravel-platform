@@ -245,3 +245,22 @@ it('returns an empty collection when the reviews api request fails', function ()
         ->toBeInstanceOf(Collection::class)
         ->toBeEmpty();
 });
+
+it('Must return an empty collection when data is unset', function ()  {
+    $payload = [
+        "success" => true,
+    ];
+
+    $service = makeReviewsServiceWithMock([
+        new Response(200, [], json_encode($payload)),
+    ]);
+
+    $hotelRegion = Resort::GarzaBlanca->region(Location::PuertoVallarta);
+
+    $reviews = $service->getByHotel($hotelRegion, Locale::English);
+
+    dump($reviews);
+    expect($reviews)
+        ->toBeInstanceOf(Collection::class)
+        ->toBeEmpty();
+});
