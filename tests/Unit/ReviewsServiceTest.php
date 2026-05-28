@@ -11,7 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use TAFER\Core\Dto\ReviewDTO;
+use TAFER\Core\Dto\ReviewDto;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
@@ -98,7 +98,7 @@ it('returns only visible five star reviews by hotel', function () {
 
     $review = $reviews->first();
 
-    expect($review)->toBeInstanceOf(ReviewDTO::class);
+    expect($review)->toBeInstanceOf(ReviewDto::class);
 
     expect($review->id)->toBe(3);
     expect($review->rating)->toBe(5);
@@ -156,7 +156,7 @@ it('returns only visible five star reviews by brand', function () {
 
     $review = $reviews->first();
 
-    expect($review)->toBeInstanceOf(ReviewDTO::class);
+    expect($review)->toBeInstanceOf(ReviewDto::class);
 
     expect($review->id)->toBe(3);
     expect($review->rating)->toBe(5);

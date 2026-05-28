@@ -1,6 +1,6 @@
 <?php
 
-use TAFER\Core\Dto\ReviewDTO;
+use TAFER\Core\Dto\ReviewDto;
 use TAFER\Core\Enums\Locale;
 use Tests\Support;
 use Tests\Support\Fixture;
@@ -10,15 +10,15 @@ it('Must return a ReviewDto', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
     $rawReview = $json['en']['data'][0];
 
-    $dto = ReviewDTO::fromArray($rawReview);
-    expect($dto)->toBeInstanceOf(ReviewDTO::class);
+    $dto = ReviewDto::fromArray($rawReview);
+    expect($dto)->toBeInstanceOf(ReviewDto::class);
 });
 
 it('Must return an array', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
     $rawReview = $json['en']['data'][0];
 
-    $dto = ReviewDTO::fromArray($rawReview);
+    $dto = ReviewDto::fromArray($rawReview);
 
     expect($dto->toArray())->toBeArray();
 });
@@ -27,7 +27,7 @@ it('Must return the expected array structure', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
     $rawReview = $json['en']['data'][0];
 
-    $dto = ReviewDTO::fromArray($rawReview);
+    $dto = ReviewDto::fromArray($rawReview);
     $array = $dto->toArray();
 
     expect($array)
@@ -54,7 +54,7 @@ it('Must be json encodable', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
     $rawReview = $json['en']['data'][0];
 
-    $dto = ReviewDTO::fromArray($rawReview);
+    $dto = ReviewDto::fromArray($rawReview);
 
     $encoded = json_encode($dto->toArray(), JSON_THROW_ON_ERROR);
 
@@ -67,7 +67,7 @@ it('Must not expose enum objects in array output', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
     $rawReview = $json['en']['data'][0];
 
-    $dto = ReviewDTO::fromArray($rawReview);
+    $dto = ReviewDto::fromArray($rawReview);
     $arrDto = $dto->toArray();
 
     expect($arrDto['language'])->toBe($rawReview['language'])

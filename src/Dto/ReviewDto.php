@@ -14,7 +14,7 @@ use TAFER\Core\Enums\Location;
  *
  * This DTO normalizes raw review data into strongly typed values.
  */
-final readonly class ReviewDTO
+final readonly class ReviewDto
 {
     /**
      * @param int $id Internal review identifier.

@@ -3,7 +3,7 @@
 namespace TAFER\Core\Contracts;
 
 use Illuminate\Support\Collection;
-use TAFER\Core\Dto\ReviewDTO;
+use TAFER\Core\Dto\ReviewDto;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\ResortRegion;
@@ -19,7 +19,7 @@ interface ReviewClient
      * @param ResortRegion $hotel Resort region used to resolve the review code ex: MSPV - GBCN - VPCN.
      * @param Locale $locale Locale used for the request language.
      *
-     * @return Collection<int, ReviewDTO> Collection of review DTOs.
+     * @return Collection<int, ReviewDto> Collection of review DTOs.
      */
     public function getByHotel(ResortRegion $hotel, Locale $locale): Collection;
 
@@ -29,7 +29,7 @@ interface ReviewClient
      * @param Resort $resort Resort enum used to resolve the brand code. Ex: GB, VP, MS, etc.
      * @param Locale $locale Locale used for the request language.
      *
-     * @return Collection<int, ReviewDTO> Collection of review DTOs.
+     * @return Collection<int, ReviewDto> Collection of review DTOs.
      */
     public function getByBrand(Resort $resort, Locale $locale): Collection;
 }

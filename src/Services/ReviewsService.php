@@ -7,7 +7,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use TAFER\Core\Contracts\ReviewClient;
-use TAFER\Core\Dto\ReviewDTO;
+use TAFER\Core\Dto\ReviewDto;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Records\ResortRegion;
@@ -26,7 +26,7 @@ class ReviewsService implements ReviewClient
     }
 
     /**
-     * @return Collection<ReviewDTO>
+     * @return Collection<ReviewDto>
      */
     public function getByHotel(ResortRegion $hotel, Locale $locale): Collection
     {
@@ -34,7 +34,7 @@ class ReviewsService implements ReviewClient
     }
 
     /**
-     * @return Collection<ReviewDTO>
+     * @return Collection<ReviewDto>
      */
     public function getByBrand(Resort $resort, Locale $locale): Collection
     {
@@ -44,7 +44,7 @@ class ReviewsService implements ReviewClient
     /**
      * Fetch reviews from the given endpoint and map them into DTOs.
      *
-     * @return Collection<int, ReviewDTO>
+     * @return Collection<int, ReviewDto>
      */
     private function getReviews(string $endpoint, Locale $locale): Collection
     {
@@ -61,7 +61,7 @@ class ReviewsService implements ReviewClient
             $payload = json_decode($response->getBody()->getContents(), true);
 
             return collect($this->filterReviews($payload['data']))
-                ->map(fn (array $review): ReviewDTO => ReviewDTO::fromArray($review))
+                ->map(fn (array $review): ReviewDto => ReviewDto::fromArray($review))
                 ->values();
 
         } catch (ClientException $e) {
