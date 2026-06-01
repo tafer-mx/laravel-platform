@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Blade;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Services\ReviewsService;
 use TAFER\Core\View\Components\PhoneDirectory;
+use TAFER\Core\Context\RequestCtx;
 class TAFERServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->scoped(RequestCtx::class, fn () => new RequestCtx(config('tafer.brand.slug')));
         $this->app->singleton(ReviewClient::class, fn () => new ReviewsService(
             new Client([
                 'base_uri' => config('tafer.middleware.base_url'),
