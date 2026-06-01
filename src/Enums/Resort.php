@@ -34,7 +34,7 @@
         {
             return match ($this) {
                 self::GarzaBlanca => 'GB',
-                self::HotelMousai => 'HM',
+                self::HotelMousai => 'MS',
                 self::VillaPalmarCancun => 'VP',
                 self::Sanctuary => 'SNCTRY',
             };
@@ -99,6 +99,22 @@
             foreach ($this->regions() as $region) {
                 if ($region->location === $location) {
                     return $region;
+                }
+            }
+
+            return null;
+        }
+
+
+        public static function resortByRegionCode(string $code): ?self
+        {
+             $code = strtoupper(trim($code));
+
+            foreach (self::cases() as $resort) {
+                foreach ($resort->regions() as $region) {
+                    if ($region->code === $code) {
+                        return $resort;
+                    }
                 }
             }
 

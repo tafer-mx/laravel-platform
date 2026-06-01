@@ -1,0 +1,9 @@
+/workbench export-ignore
+/tests export-ignore
+/.github export-ignore
+/.phpunit.cache export-ignore
+/node_modules export-ignore
+/vite.config.js export-ignore
+/phpunit.xml export-ignore
+/testbench.yaml export-ignore
+/.env export-ignore
