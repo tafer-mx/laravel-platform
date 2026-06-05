@@ -1,0 +1,59 @@
+<?php
+
+use Illuminate\Http\Request;
+use Orchestra\Testbench\TestCase;
+use Symfony\Component\HttpFoundation\Response;
+use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Enums\Locale;
+use TAFER\Core\Enums\Location;
+use TAFER\Core\Middlewares\ResolveRequestCtx;
+
+uses(TestCase::class);
+
+it('resolves request context from request segments', function () {
+    $requestCtx = new RequestCtx('garza-blanca');
+    $middleware = new ResolveRequestCtx($requestCtx);
+    $request = Request::create(
+        '/es/puerto-vallarta/special-offers-and-packages/loyalty-sale',
+        'GET',
+        ['_storyblok' => '1']
+    );
+
+    $response = $middleware->handle($request, fn () => new Response('ok'));
+
+    expect($response->getContent())->toBe('ok')
+        ->and($requestCtx->slug)->toBe('puerto-vallarta/special-offers-and-packages/loyalty-sale')
+        ->and($requestCtx->isPreview)->toBeTrue()
+        ->and($requestCtx->locale)->toBe(Locale::Spanish)
+        ->and($requestCtx->location)->toBe(Location::PuertoVallarta);
+});
+
+it('applies the resolved locale and shares the request context with views', function () {
+    $requestCtx = new RequestCtx('mousai');
+    $middleware = new ResolveRequestCtx($requestCtx);
+    $request = Request::create('/cancun/gallery');
+
+    $middleware->handle($request, fn () => new Response('ok'));
+
+    expect(app()->getLocale())->toBe('en')
+        ->and(view()->shared('requestCtx'))->toBe($requestCtx)
+        ->and($requestCtx->slug)->toBe('cancun/gallery')
+        ->and($requestCtx->isPreview)->toBeFalse()
+        ->and($requestCtx->locale)->toBe(Locale::English)
+        ->and($requestCtx->location)->toBe(Location::Cancun);
+});
+
+it('does not allow the same request context to be resolved twice', function () {
+    $requestCtx = new RequestCtx('garza-blanca');
+    $middleware = new ResolveRequestCtx($requestCtx);
+
+    $middleware->handle(
+        Request::create('/puerto-vallarta/offers'),
+        fn () => new Response('ok')
+    );
+
+    $middleware->handle(
+        Request::create('/es/cancun/gallery'),
+        fn () => new Response('ok')
+    );
+})->throws(LogicException::class, 'RequestCtx property [locale] has already been set.');

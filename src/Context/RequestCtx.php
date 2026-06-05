@@ -5,7 +5,6 @@ namespace TAFER\Core\Context;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
-use TAFER\Core\Records\ResortRegion;
 
 /**
  * Class RequestCtx
@@ -21,29 +20,16 @@ use TAFER\Core\Records\ResortRegion;
 
 class RequestCtx
 {
-    public Resort $resort;
-    public Locale $locale;
-    public Location $location;
-    public string $slug;
-    public bool $isPreview;
+    public readonly Resort $resort;
+    public readonly Locale $locale;
+    public readonly Location $location;
+    public readonly string $slug;
+    public readonly bool $isPreview;
     //TODO: ADD DEVICE public string $device;
 
     public function __construct(string $brandSlug)
     {
         $this->resort = Resort::tryFrom($brandSlug) ?? throw new \InvalidArgumentException("Invalid resort slug: {$brandSlug}");
-        $this->isPreview = false; //default value, can be changed later with the setter
-    }
-
-    /**
-     * Set the resort for this request context.
-     *
-     * @param Resort $resort
-     * @return self
-     */
-    public function setResort(Resort $resort): self
-    {
-        $this->resort = $resort;
-        return $this;
     }
 
     /**
@@ -54,6 +40,7 @@ class RequestCtx
      */
     public function setLocale(Locale $locale): self
     {
+        $this->ensurePropertyCanBeSet('locale');
         $this->locale = $locale;
         return $this;
     }
@@ -66,6 +53,7 @@ class RequestCtx
      */
     public function setLocation(Location $location): self
     {
+        $this->ensurePropertyCanBeSet('location');
         $this->location = $location;
         return $this;
     }
@@ -78,6 +66,7 @@ class RequestCtx
      */
     public function setSlug(string $slug): self
     {
+        $this->ensurePropertyCanBeSet('slug');
         $this->slug = $slug;
         return $this;
     }
@@ -90,7 +79,15 @@ class RequestCtx
      */
     public function setIsPreview(bool $isPreview): self
     {
+        $this->ensurePropertyCanBeSet('isPreview');
         $this->isPreview = $isPreview;
         return $this;
+    }
+
+    private function ensurePropertyCanBeSet(string $property): void
+    {
+        if ((new \ReflectionProperty($this, $property))->isInitialized($this)) {
+            throw new \LogicException("RequestCtx property [{$property}] has already been set.");
+        }
     }
 }

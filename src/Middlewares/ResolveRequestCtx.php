@@ -25,10 +25,10 @@ class ResolveRequestCtx
         $slugWithoutLocale = RequestCtxSupport::getSlugWithoutLocaleBySegments($requestSegments);
 
         $this->requestCtx
-            ->setSlug($slugWithoutLocale)
-            ->setIsPreview($isPreview)
             ->setLocale($locale['locale'])
-            ->setLocation($location);
+            ->setLocation($location)
+            ->setSlug($slugWithoutLocale)
+            ->setIsPreview($isPreview);
 
         app()->setLocale($this->requestCtx->locale->value);
         view()->share('requestCtx', $this->requestCtx); 
