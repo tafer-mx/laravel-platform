@@ -15,7 +15,6 @@ use TAFER\Core\Records\PhoneNumber;
  */
 final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
-
     public function resort(): Resort
     {
         return Resort::GarzaBlanca;
@@ -33,7 +32,7 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                     Device::Mobile->value => new PhoneNumber(
                         '+528006490462',
                         '+52 800 649 0462'
-                    )
+                    ),
                 ],
                 Locale::English->value => [
                     Device::Desktop->value => new PhoneNumber(
@@ -56,9 +55,9 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                         PhoneSource::Gads->value => new PhoneNumber(
                             '+14452134644',
                             '+1 445 213 4644'
-                        )
-                    ]
-                ]
+                        ),
+                    ],
+                ],
             ],
             Location::Cabo->value => [
                 Locale::Spanish->value => [
@@ -69,7 +68,7 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                     Device::Mobile->value => new PhoneNumber(
                         '+528006490552',
                         '+52 800 649 0552'
-                    )
+                    ),
                 ],
                 Locale::English->value => [
                     Device::Desktop->value => new PhoneNumber(
@@ -92,9 +91,9 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                         PhoneSource::Gads->value => new PhoneNumber(
                             '+14806482672',
                             '+1 480 648 2672'
-                        )
-                    ]
-                ]
+                        ),
+                    ],
+                ],
             ],
             Location::PuertoVallarta->value => [
                 Locale::Spanish->value => [
@@ -105,7 +104,7 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                     Device::Mobile->value => new PhoneNumber(
                         '+528006490485',
                         '+52 800 649 0485'
-                    )
+                    ),
                 ],
                 Locale::English->value => [
                     Device::Desktop->value => new PhoneNumber(
@@ -129,9 +128,9 @@ final readonly class GarzaBlancaPhoneDirectory extends PhoneDirectory implements
                             '+14158397285',
                             '+1 415 839 7285'
                         ),
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 }

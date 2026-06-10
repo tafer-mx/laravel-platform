@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
-use TAFER\Core\Phones\GarzaBlancaPhoneDirectory;
 use TAFER\Core\Enums\Resort;
-use TAFER\Core\Enums\Device;
+use TAFER\Core\Phones\GarzaBlancaPhoneDirectory;
 
 Route::get('/', function () {
     return redirect('/hello-world');
@@ -16,7 +16,7 @@ Route::get('/hello-world', function () {
 });
 
 Route::get('/phones', function () {
-    $directory = new GarzaBlancaPhoneDirectory();
+    $directory = new GarzaBlancaPhoneDirectory;
 
     return response()->json([
         'resort' => $directory->resort()->label(),

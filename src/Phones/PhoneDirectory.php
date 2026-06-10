@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace TAFER\Core\Phones;
 
@@ -26,11 +26,10 @@ abstract readonly class PhoneDirectory
     /**
      * Resolve a phone number.
      *
-     * @param Location $location Location used to resolve the phone number.
-     * @param Locale $locale Locale used to resolve the phone number.
-     * @param Device $device Device used for default phone numbers.
-     * @param PhoneSource|null $source Optional campaign/source.
-     *
+     * @param  Location  $location  Location used to resolve the phone number.
+     * @param  Locale  $locale  Locale used to resolve the phone number.
+     * @param  Device  $device  Device used for default phone numbers.
+     * @param  PhoneSource|null  $source  Optional campaign/source.
      * @return PhoneNumber|null Matching phone number, or null when not configured.
      */
     public function get(
@@ -57,10 +56,9 @@ abstract readonly class PhoneDirectory
     /**
      * Resolve a default phone number by device.
      *
-     * @param Location $location Location used to resolve the phone number.
-     * @param Locale $locale Locale used to resolve the phone number.
-     * @param Device $device Device used to resolve the phone number.
-     *
+     * @param  Location  $location  Location used to resolve the phone number.
+     * @param  Locale  $locale  Locale used to resolve the phone number.
+     * @param  Device  $device  Device used to resolve the phone number.
      * @return PhoneNumber|null Matching phone number, or null when not configured.
      */
     public function default(
@@ -70,19 +68,16 @@ abstract readonly class PhoneDirectory
     ): ?PhoneNumber {
         $phones = $this->phones();
 
-        return $phones[$location->value]
-            [$locale->value]
-            [$device->value]
+        return $phones[$location->value][$locale->value][$device->value]
             ?? null;
     }
 
     /**
      * Resolve a campaign-specific phone number.
      *
-     * @param Location $location Location used to resolve the phone number.
-     * @param Locale $locale Locale used to resolve the phone number.
-     * @param PhoneSource $source Campaign/source used to resolve the phone number.
-     *
+     * @param  Location  $location  Location used to resolve the phone number.
+     * @param  Locale  $locale  Locale used to resolve the phone number.
+     * @param  PhoneSource  $source  Campaign/source used to resolve the phone number.
      * @return PhoneNumber|null Matching phone number, or null when not configured.
      */
     public function campaign(
@@ -92,14 +87,11 @@ abstract readonly class PhoneDirectory
     ): ?PhoneNumber {
         $phones = $this->phones();
 
-        return $phones[$location->value]
-            [$locale->value]
-            [self::CAMPAIGNS_KEY]
-            [$source->value]
+        return $phones[$location->value][$locale->value][self::CAMPAIGNS_KEY][$source->value]
             ?? null;
     }
 
-     /**
+    /**
      * Get the Resort phone directory.
      *
      * @return array<string, array<string, array{

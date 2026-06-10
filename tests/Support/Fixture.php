@@ -8,7 +8,7 @@ final class Fixture
 {
     public static function getTestFixture(string $filename): array
     {
-        $path = __DIR__ . '/..' . '/fixtures/' . ltrim($filename, '/');
+        $path = __DIR__.'/..'.'/fixtures/'.ltrim($filename, '/');
 
         if (! file_exists($path)) {
             throw new RuntimeException("Fixture not found: {$path}");
@@ -20,7 +20,7 @@ final class Fixture
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new RuntimeException(
-                'Invalid JSON fixture: ' . json_last_error_msg()
+                'Invalid JSON fixture: '.json_last_error_msg()
             );
         }
 

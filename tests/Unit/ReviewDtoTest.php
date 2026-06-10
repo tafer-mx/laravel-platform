@@ -1,10 +1,7 @@
 <?php
 
 use TAFER\Core\Dto\ReviewDto;
-use TAFER\Core\Enums\Locale;
-use Tests\Support;
 use Tests\Support\Fixture;
-
 
 it('Must return a ReviewDto', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');
@@ -46,7 +43,7 @@ it('Must return the expected array structure', function () {
             'provider',
             'visibility',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]);
 });
 
@@ -61,7 +58,6 @@ it('Must be json encodable', function () {
     expect($encoded)->toBeString()
         ->and(json_decode($encoded, true, 512, JSON_THROW_ON_ERROR))->toBeArray();
 });
-
 
 it('Must not expose enum objects in array output', function () {
     $json = Fixture::getTestFixture('review-response.fixture.json');

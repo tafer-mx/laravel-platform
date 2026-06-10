@@ -28,11 +28,10 @@ interface ResortPhoneDirectory
      * campaign-specific phone number. Otherwise, it should resolve the default
      * phone number for the given device.
      *
-     * @param Location $location Location used to resolve the phone number.
-     * @param Locale $locale Locale used to resolve the phone number.
-     * @param Device $device Device used for default phone numbers.
-     * @param PhoneSource|null $source Optional campaign/source.
-     *
+     * @param  Location  $location  Location used to resolve the phone number.
+     * @param  Locale  $locale  Locale used to resolve the phone number.
+     * @param  Device  $device  Device used for default phone numbers.
+     * @param  PhoneSource|null  $source  Optional campaign/source.
      * @return PhoneNumber|null Matching phone number, or null when not configured.
      */
     public function get(

@@ -8,9 +8,9 @@ use TAFER\Core\Phones\VillaPalmarPhoneDirectory;
 use TAFER\Core\Records\PhoneNumber;
 
 describe('VPCN Phone Directory', function () {
-    describe('English', function(){
+    describe('English', function () {
         it('gets the English desktop phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -25,7 +25,7 @@ describe('VPCN Phone Directory', function () {
         });
 
         it('gets the English mobile phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -40,7 +40,7 @@ describe('VPCN Phone Directory', function () {
         });
 
         it('gets the English email campaign phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -55,7 +55,7 @@ describe('VPCN Phone Directory', function () {
         });
 
         it('gets the English FADS campaign phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -70,7 +70,7 @@ describe('VPCN Phone Directory', function () {
         });
 
         it('gets the English GADS campaign phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -83,11 +83,11 @@ describe('VPCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+16028132073')
                 ->and($phone->buttonText)->toBe('+1 602 813 2073');
         });
-   });
+    });
 
-   describe('Spanish', function () {
+    describe('Spanish', function () {
         it('gets the Spanish desktop phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -102,7 +102,7 @@ describe('VPCN Phone Directory', function () {
         });
 
         it('gets the Spanish mobile phone number for Villa Palmar Cancun', function () {
-            $directory = new VillaPalmarPhoneDirectory();
+            $directory = new VillaPalmarPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -115,5 +115,5 @@ describe('VPCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+528006490442')
                 ->and($phone->buttonText)->toBe('+52 800 649 0442');
         });
-   });
+    });
 });

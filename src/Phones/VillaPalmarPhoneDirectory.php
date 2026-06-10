@@ -15,7 +15,6 @@ use TAFER\Core\Records\PhoneNumber;
  */
 final readonly class VillaPalmarPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
-
     public function resort(): Resort
     {
         return Resort::VillaPalmarCancun;
@@ -33,7 +32,7 @@ final readonly class VillaPalmarPhoneDirectory extends PhoneDirectory implements
                     Device::Mobile->value => new PhoneNumber(
                         '+528006490442',
                         '+52 800 649 0442'
-                    )
+                    ),
                 ],
                 Locale::English->value => [
                     Device::Desktop->value => new PhoneNumber(
@@ -56,10 +55,10 @@ final readonly class VillaPalmarPhoneDirectory extends PhoneDirectory implements
                         PhoneSource::Gads->value => new PhoneNumber(
                             '+16028132073',
                             '+1 602 813 2073'
-                        )
-                    ]
-                ]
-            ]
+                        ),
+                    ],
+                ],
+            ],
         ];
     }
 }

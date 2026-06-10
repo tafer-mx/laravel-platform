@@ -23,6 +23,6 @@ class WorkbenchServiceProvider extends ServiceProvider
         ? \workbench_path('resources/views')
         : base_path('workbench/resources/views');
 
-         $this->loadViewsFrom($path, 'workbench');
+        $this->loadViewsFrom($path, 'workbench');
     }
 }
