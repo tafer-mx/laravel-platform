@@ -1,6 +1,7 @@
 <?php
 
 use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
@@ -20,13 +21,16 @@ it('sets request context values fluently', function () {
         ->setLocale(Locale::Spanish)
         ->setLocation(Location::Cancun)
         ->setSlug('special-offers-and-packages')
-        ->setIsPreview(true);
+        ->setIsPreview(true)
+        ->setDevice(Device::Mobile);
 
     expect($requestCtx->resort)->toBe(Resort::GarzaBlanca)
         ->and($requestCtx->locale)->toBe(Locale::Spanish)
         ->and($requestCtx->location)->toBe(Location::Cancun)
         ->and($requestCtx->slug)->toBe('special-offers-and-packages')
-        ->and($requestCtx->isPreview)->toBeTrue();
+        ->and($requestCtx->isPreview)->toBeTrue()
+        ->and($requestCtx->device)->toBe(Device::Mobile)
+        ->and($requestCtx->device->isMobile())->toBeTrue();
 });
 
 it('does not allow a request context property to be set twice', function () {
@@ -44,3 +48,9 @@ it('does not allow preview mode to be set twice', function () {
 
     $requestCtx->setIsPreview(true);
 })->throws(LogicException::class, 'RequestCtx property [isPreview] has already been set.');
+
+it('does not allow device to be set twice', function () {
+    $requestCtx = (new RequestCtx('garza-blanca'))->setDevice(Device::Desktop);
+
+    $requestCtx->setDevice(Device::Mobile);
+})->throws(LogicException::class, 'RequestCtx property [device] has already been set.');

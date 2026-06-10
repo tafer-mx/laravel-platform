@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Middlewares\ResolveRequestCtx;
@@ -16,7 +17,12 @@ it('resolves request context from request segments', function () {
     $request = Request::create(
         '/es/puerto-vallarta/special-offers-and-packages/loyalty-sale',
         'GET',
-        ['_storyblok' => '1']
+        ['_storyblok' => '1'],
+        [],
+        [],
+        [
+            'HTTP_USER_AGENT' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        ]
     );
 
     $response = $middleware->handle($request, fn () => new Response('ok'));
@@ -25,7 +31,9 @@ it('resolves request context from request segments', function () {
         ->and($requestCtx->slug)->toBe('puerto-vallarta/special-offers-and-packages/loyalty-sale')
         ->and($requestCtx->isPreview)->toBeTrue()
         ->and($requestCtx->locale)->toBe(Locale::Spanish)
-        ->and($requestCtx->location)->toBe(Location::PuertoVallarta);
+        ->and($requestCtx->location)->toBe(Location::PuertoVallarta)
+        ->and($requestCtx->device)->toBe(Device::Mobile)
+        ->and($requestCtx->device->isMobile())->toBeTrue();
 });
 
 it('applies the resolved locale and shares the request context with views', function () {

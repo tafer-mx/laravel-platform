@@ -23,12 +23,14 @@ class ResolveRequestCtx
         $locale = RequestCtxSupport::getLocaleBySegments($requestSegments);
         $location = RequestCtxSupport::getLocationBySegments($requestSegments);
         $slugWithoutLocale = RequestCtxSupport::getSlugWithoutLocaleBySegments($requestSegments);
+        $device = RequestCtxSupport::getDeviceByRequest($request);
 
         $this->requestCtx
             ->setLocale($locale['locale'])
             ->setLocation($location)
             ->setSlug($slugWithoutLocale)
-            ->setIsPreview($isPreview);
+            ->setIsPreview($isPreview)
+            ->setDevice($device);
 
         app()->setLocale($this->requestCtx->locale->value);
         view()->share('requestCtx', $this->requestCtx); 

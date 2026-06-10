@@ -2,6 +2,7 @@
 
 namespace TAFER\Core\Context;
 
+use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
@@ -25,7 +26,7 @@ class RequestCtx
     public readonly Location $location;
     public readonly string $slug;
     public readonly bool $isPreview;
-    //TODO: ADD DEVICE public string $device;
+    public readonly Device $device;
 
     public function __construct(string $brandSlug)
     {
@@ -81,6 +82,19 @@ class RequestCtx
     {
         $this->ensurePropertyCanBeSet('isPreview');
         $this->isPreview = $isPreview;
+        return $this;
+    }
+
+    /**
+     * Set the request device.
+     *
+     * @param Device $device
+     * @return self
+     */
+    public function setDevice(Device $device): self
+    {
+        $this->ensurePropertyCanBeSet('device');
+        $this->device = $device;
         return $this;
     }
 

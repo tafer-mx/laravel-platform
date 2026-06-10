@@ -2,6 +2,9 @@
 
 namespace TAFER\Core\Support;
 
+use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
+use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 
@@ -108,5 +111,20 @@ class RequestCtxSupport
 
         $slug = implode('/', $segments);
         return $slug === '' ? '/' : $slug;
+    }
+
+    /**
+     * Resolve the normalized device type from the current request.
+     *
+     * @param Request $request Current HTTP request.
+     * @return Device
+     */
+    public static function getDeviceByRequest(Request $request): Device
+    {
+        $agent = new Agent();
+        $agent->setHttpHeaders($request->server->all());
+        $agent->setUserAgent($request->userAgent());
+
+        return $agent->isTablet() || $agent->isMobile() ? Device::Mobile : Device::Desktop;
     }
 }
