@@ -7,26 +7,23 @@ use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
-use TAFER\Core\Contracts\DeferredExecutor;
 use TAFER\Core\Contracts\StoryblokCache;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Storyblok\CachedStory;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
-use TAFER\Core\Storyblok\StoryblokCacheEntry;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokIdentity;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
-use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use Throwable;
+
+use function Illuminate\Support\defer;
 
 final readonly class CachedStoryblokService implements StoryblokGateway
 {
     public function __construct(
         private StoryblokGateway $origin,
         private StoryblokCache $cache,
-        private DeferredExecutor $deferred,
-        private StoryblokSlugNormalizer $normalizer,
         private StoryblokRequestFactory $requests,
         private StoryblokCachePolicy $policy,
         private Version $defaultVersion = Version::Published,
@@ -39,11 +36,11 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         $request = $this->requests->make($request, $this->defaultVersion);
 
         if (! $this->policy->shouldCache($request, $this->defaultVersion)) {
-            return $this->origin->getStory($this->normalizer->canonicalSlug($slug), $request);
+            return $this->origin->getStory($this->canonicalSlug($slug), $request);
         }
 
         $context = $this->context($request);
-        $identity = $this->normalizer->fromSlug($slug, $context->locale);
+        $identity = new StoryblokIdentity($this->canonicalSlug($slug), $context->locale);
         $cached = $this->cache->get($identity, $context);
 
         if ($cached !== null) {
@@ -76,8 +73,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         }
 
         $response = $this->origin->getStoryByUuid($uuid, $request);
-        $identity = $this->normalizer
-            ->fromStory($response->story, $context->locale)
+        $identity = $this->identityFromStory($response->story, $context->locale)
             ->withUuid($uuidString);
 
         $this->scheduleCacheWrite($identity, $response, $context);
@@ -97,8 +93,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
             $identity->canonicalSlug,
         ]);
 
-        $this->deferred->execute(
-            $name,
+        defer(
             function () use ($identity, $response, $context): void {
                 try {
                     $this->cache->put(
@@ -116,6 +111,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
                     }
                 }
             },
+            $name,
         );
     }
 
@@ -128,7 +124,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         StoryblokCacheContext $context,
     ): void {
         try {
-            $identity = $this->normalizer->fromStory($relation, $context->locale);
+            $identity = $this->identityFromStory($relation, $context->locale);
         } catch (InvalidArgumentException) {
             return;
         }
@@ -141,7 +137,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
             $identity,
             CachedStory::fromRelation($relation, $cv),
             $context,
-            StoryblokCacheEntry::Relation,
+            isRelation: true,
         );
     }
 
@@ -153,5 +149,39 @@ final readonly class CachedStoryblokService implements StoryblokGateway
             $this->cacheNamespace,
             $this->defaultLocale,
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $story
+     */
+    private function identityFromStory(array $story, Locale $locale): StoryblokIdentity
+    {
+        $fullSlug = $story['full_slug'] ?? null;
+
+        if (! is_string($fullSlug) || trim($fullSlug, '/') === '') {
+            throw new InvalidArgumentException('The Storyblok story must contain a non-empty full_slug.');
+        }
+
+        $uuid = $story['uuid'] ?? null;
+
+        return new StoryblokIdentity(
+            canonicalSlug: $this->canonicalSlug($fullSlug),
+            locale: $locale,
+            uuid: is_string($uuid) && $uuid !== '' ? $uuid : null,
+        );
+    }
+
+    private function canonicalSlug(string $slug): string
+    {
+        $segments = array_values(array_filter(
+            explode('/', trim($slug, '/')),
+            static fn (string $segment): bool => $segment !== '',
+        ));
+
+        if ($segments !== [] && Locale::tryFrom($segments[0]) !== null) {
+            array_shift($segments);
+        }
+
+        return implode('/', $segments);
     }
 }

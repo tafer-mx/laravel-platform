@@ -52,13 +52,11 @@ final readonly class LaravelStoryblokCache implements StoryblokCache
         StoryblokIdentity $identity,
         CachedStory $story,
         StoryblokCacheContext $context,
-        StoryblokCacheEntry $entry = StoryblokCacheEntry::Story,
+        bool $isRelation = false,
     ): void {
         $uuid = $identity->uuid ?? $story->story['uuid'] ?? null;
         $identity = $identity->withUuid(is_string($uuid) && $uuid !== '' ? $uuid : null);
-        $ttl = $entry === StoryblokCacheEntry::Relation
-            ? $this->relationTtl
-            : $this->storyTtl;
+        $ttl = $isRelation ? $this->relationTtl : $this->storyTtl;
 
         $this->store(
             $this->keys->payload($identity, $context),

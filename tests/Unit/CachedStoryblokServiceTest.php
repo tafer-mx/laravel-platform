@@ -2,23 +2,24 @@
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Orchestra\Testbench\TestCase;
 use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
-use TAFER\Core\Contracts\DeferredExecutor;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Services\CachedStoryblokService;
 use TAFER\Core\Storyblok\CachedStory;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
-use TAFER\Core\Storyblok\StoryblokCacheEntry;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokIdentity;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
-use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
+
+uses(TestCase::class);
 
 function cachedStoryblokResponse(array $story = [], array $relations = []): StoryResponse
 {
@@ -70,29 +71,6 @@ function countingStoryblokGateway(StoryResponse $response): StoryblokGateway
     };
 }
 
-function fakeDeferredExecutor(): DeferredExecutor
-{
-    return new class implements DeferredExecutor
-    {
-        /** @var array<string, Closure> */
-        public array $callbacks = [];
-
-        public function execute(string $name, Closure $callback): void
-        {
-            $this->callbacks[$name] = $callback;
-        }
-
-        public function run(): void
-        {
-            foreach ($this->callbacks as $callback) {
-                $callback();
-            }
-
-            $this->callbacks = [];
-        }
-    };
-}
-
 /**
  * @return array{0: LaravelStoryblokCache, 1: Repository}
  */
@@ -112,13 +90,10 @@ function storyblokCacheFixture(): array
 function cachedStoryblokService(
     StoryblokGateway $origin,
     LaravelStoryblokCache $cache,
-    DeferredExecutor $deferred,
 ): CachedStoryblokService {
     return new CachedStoryblokService(
         origin: $origin,
         cache: $cache,
-        deferred: $deferred,
-        normalizer: new StoryblokSlugNormalizer,
         requests: new StoryblokRequestFactory([
             'Element_references.Content_info_pages',
         ]),
@@ -126,19 +101,23 @@ function cachedStoryblokService(
     );
 }
 
+function deferredCallbacks(): DeferredCallbackCollection
+{
+    return app(DeferredCallbackCollection::class);
+}
+
 it('defers caching the parent until the deferred callback runs', function () {
     [$cache] = storyblokCacheFixture();
     $origin = countingStoryblokGateway(cachedStoryblokResponse());
-    $deferred = fakeDeferredExecutor();
-    $service = cachedStoryblokService($origin, $cache, $deferred);
+    $service = cachedStoryblokService($origin, $cache);
 
     $service->getStory('home');
     $service->getStory('home');
 
     expect($origin->slugCalls)->toBe(2)
-        ->and($deferred->callbacks)->toHaveCount(1);
+        ->and(deferredCallbacks())->toHaveCount(1);
 
-    $deferred->run();
+    deferredCallbacks()->invoke();
     $service->getStory('home');
 
     expect($origin->slugCalls)->toBe(2);
@@ -155,8 +134,7 @@ it('caches every resolved relation as an independent story', function () {
         ['full_slug' => 'es/brands/mousai/puerto-vallarta/suites'],
         [$relation],
     ));
-    $deferred = fakeDeferredExecutor();
-    $service = cachedStoryblokService($origin, $cache, $deferred);
+    $service = cachedStoryblokService($origin, $cache);
     $request = new StoryRequest(language: 'es');
 
     $service->getStory('es/brands/mousai/puerto-vallarta/suites', $request);
@@ -165,7 +143,7 @@ it('caches every resolved relation as an independent story', function () {
         ->and($origin->lastRequest?->withRelations->toString())
         ->toBe('Element_references.Content_info_pages');
 
-    $deferred->run();
+    deferredCallbacks()->invoke();
     $cached = $service->getStoryByUuid($relation['uuid'], $request);
 
     expect($cached->story)->toBe($relation)
@@ -185,18 +163,17 @@ it('does not replace a relation that is already cached', function () {
             'name' => 'Webhook-authoritative version',
         ], 1),
         $context,
-        StoryblokCacheEntry::Relation,
+        isRelation: true,
     );
     $origin = countingStoryblokGateway(cachedStoryblokResponse(relations: [[
         'uuid' => $uuid,
         'full_slug' => 'relations/suite',
         'name' => 'Parent response version',
     ]]));
-    $deferred = fakeDeferredExecutor();
-    $service = cachedStoryblokService($origin, $cache, $deferred);
+    $service = cachedStoryblokService($origin, $cache);
 
     $service->getStory('home');
-    $deferred->run();
+    deferredCallbacks()->invoke();
 
     expect($cache->getByUuid($uuid, $context)?->story['name'])
         ->toBe('Webhook-authoritative version');
@@ -205,27 +182,25 @@ it('does not replace a relation that is already cached', function () {
 it('does not cache draft requests', function () {
     [$cache] = storyblokCacheFixture();
     $origin = countingStoryblokGateway(cachedStoryblokResponse());
-    $deferred = fakeDeferredExecutor();
-    $service = cachedStoryblokService($origin, $cache, $deferred);
+    $service = cachedStoryblokService($origin, $cache);
     $request = new StoryRequest(version: Version::Draft);
 
     $service->getStory('home', $request);
     $service->getStory('home', $request);
 
     expect($origin->slugCalls)->toBe(2)
-        ->and($deferred->callbacks)->toBeEmpty();
+        ->and(deferredCallbacks())->toHaveCount(0);
 });
 
 it('separates cached stories by locale', function () {
     [$cache] = storyblokCacheFixture();
     $origin = countingStoryblokGateway(cachedStoryblokResponse());
-    $deferred = fakeDeferredExecutor();
-    $service = cachedStoryblokService($origin, $cache, $deferred);
+    $service = cachedStoryblokService($origin, $cache);
 
     $service->getStory('home', new StoryRequest(language: 'en'));
-    $deferred->run();
+    deferredCallbacks()->invoke();
     $service->getStory('home', new StoryRequest(language: 'es'));
-    $deferred->run();
+    deferredCallbacks()->invoke();
     $service->getStory('home', new StoryRequest(language: 'en'));
 
     expect($origin->slugCalls)->toBe(2);
@@ -258,7 +233,7 @@ it('returns detailed invalidation results and removes all indexes', function () 
             'full_slug' => 'es/relations/suite',
         ], 1),
         $context,
-        StoryblokCacheEntry::Relation,
+        isRelation: true,
     );
 
     $result = $cache->invalidate(

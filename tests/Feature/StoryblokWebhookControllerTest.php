@@ -15,7 +15,6 @@ use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokIdentity;
-use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
 
 uses(TestCase::class);
@@ -35,7 +34,6 @@ it('invalidates both locales from a Storyblok webhook payload', function () {
         StoryblokWebhookInvalidator::class,
         fn () => new StoryblokWebhookInvalidator(
             app(StoryblokCacheInvalidator::class),
-            new StoryblokSlugNormalizer,
         ),
     );
 

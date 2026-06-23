@@ -31,8 +31,6 @@ classDiagram
     class CachedStoryblokService {
         -StoryblokGateway origin
         -StoryblokCache cache
-        -DeferredExecutor deferred
-        -StoryblokSlugNormalizer normalizer
         -StoryblokRequestFactory requests
     }
 
@@ -40,7 +38,7 @@ classDiagram
         <<interface>>
         +get(identity, context) CachedStory
         +getByUuid(uuid, context) CachedStory
-        +put(identity, story, context, entry)
+        +put(identity, story, context, isRelation)
         +invalidate(identity, context) StoryblokInvalidationResult
     }
 
@@ -62,10 +60,8 @@ classDiagram
 | `StoryblokService` | Ejecutar `bySlug()` y `byUuid()` sin conocer el caché. |
 | `CachedStoryblokService` | Coordinar hits, misses, draft y escritura de `rels`. |
 | `StoryblokRequestFactory` | Agregar locale, versión, `resolve_links` y `resolve_relations`. |
-| `StoryblokSlugNormalizer` | Quitar `/` y prefijos `en/` o `es/`; producir el slug canónico. |
 | `StoryblokIdentity` | Representar slug canónico, `Locale` y UUID opcional. |
 | `LaravelStoryblokCache` | Guardar payload e índices bidireccionales en Laravel Cache. |
-| `DeferredExecutor` | Posponer y deduplicar escrituras mediante Laravel `defer()`. |
 | `StoryblokWebhookInvalidator` | Convertir un webhook en una invalidación publicada. |
 | `RequestCtx::storyblokSlug()` | Traducir la petición actual al path interno usado por Storyblok. |
 
@@ -238,7 +234,7 @@ sequenceDiagram
     participant Repo as StoryblokCache
     participant API as StoryblokService
     participant SB as Storyblok
-    participant Defer as DeferredExecutor
+    participant Defer as Laravel defer()
 
     App->>Cached: getStory(rawSlug, request)
     Cached->>Cached: Normaliza slug y locale
@@ -303,9 +299,6 @@ sequenceDiagram
     Defer->>Cache: parent + relación A + índices
 ```
 
-`ImmediateDeferredExecutor` está disponible para tests o procesos donde se necesite
-ejecutar el callback inmediatamente.
-
 ## Escritura de relaciones
 
 Por cada elemento de `StoryResponse::$rels`:
@@ -314,7 +307,7 @@ Por cada elemento de `StoryResponse::$rels`:
 2. Debe contener un UUID.
 3. Se normaliza usando el mismo locale de la parent.
 4. Si el payload ya existe, no se reemplaza.
-5. Si no existe, se guarda como `StoryblokCacheEntry::Relation`.
+5. Si no existe, se guarda como relación para usar el TTL configurado de relaciones.
 
 ```mermaid
 flowchart TD

@@ -9,19 +9,7 @@ use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokIdentity;
-use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
-
-it('normalizes locale-prefixed Storyblok slugs', function () {
-    $normalizer = new StoryblokSlugNormalizer;
-
-    expect($normalizer->canonicalSlug('/es/brands/mousai/puerto-vallarta/suites/'))
-        ->toBe('brands/mousai/puerto-vallarta/suites')
-        ->and($normalizer->localeFromSlug('es/brands/mousai'))
-        ->toBe(Locale::Spanish)
-        ->and($normalizer->localeFromSlug('brands/mousai'))
-        ->toBe(Locale::English);
-});
 
 it('invalidates both locales when a webhook reports both translations', function () {
     $repository = new Repository(new ArrayStore);
@@ -29,8 +17,7 @@ it('invalidates both locales when a webhook reports both translations', function
         $repository,
         new StoryblokCacheKey('test:storyblok'),
     );
-    $normalizer = new StoryblokSlugNormalizer;
-    $webhook = new StoryblokWebhookInvalidator($cache, $normalizer);
+    $webhook = new StoryblokWebhookInvalidator($cache);
     $uuid = '550e8400-e29b-41d4-a716-446655440001';
 
     foreach (Locale::cases() as $locale) {

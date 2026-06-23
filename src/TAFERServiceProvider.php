@@ -12,7 +12,6 @@ use Storyblok\Api\StoriesApiInterface;
 use Storyblok\Api\StoryblokClient;
 use Storyblok\Api\StoryblokClientInterface;
 use TAFER\Core\Context\RequestCtx;
-use TAFER\Core\Contracts\DeferredExecutor;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Contracts\StoryblokCache;
 use TAFER\Core\Contracts\StoryblokCacheInvalidator;
@@ -21,12 +20,10 @@ use TAFER\Core\Enums\Locale;
 use TAFER\Core\Services\CachedStoryblokService;
 use TAFER\Core\Services\ReviewsService;
 use TAFER\Core\Services\StoryblokService;
-use TAFER\Core\Storyblok\LaravelDeferredExecutor;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
-use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
 use TAFER\Core\View\Components\PhoneDirectory;
 
@@ -66,9 +63,6 @@ class TAFERServiceProvider extends ServiceProvider
         $this->app->singleton(StoryblokService::class, fn () => new StoryblokService(
             $this->app->make(StoriesApiInterface::class),
         ));
-
-        $this->app->singleton(DeferredExecutor::class, LaravelDeferredExecutor::class);
-        $this->app->singleton(StoryblokSlugNormalizer::class);
 
         $this->app->singleton(StoryblokRequestFactory::class, function () {
             $locale = Locale::tryFrom(
@@ -122,8 +116,6 @@ class TAFERServiceProvider extends ServiceProvider
             return new CachedStoryblokService(
                 origin: $origin,
                 cache: $this->app->make(StoryblokCache::class),
-                deferred: $this->app->make(DeferredExecutor::class),
-                normalizer: $this->app->make(StoryblokSlugNormalizer::class),
                 requests: $this->app->make(StoryblokRequestFactory::class),
                 policy: new StoryblokCachePolicy,
                 defaultVersion: $version,
@@ -134,7 +126,6 @@ class TAFERServiceProvider extends ServiceProvider
 
         $this->app->singleton(StoryblokWebhookInvalidator::class, fn () => new StoryblokWebhookInvalidator(
             cache: $this->app->make(StoryblokCacheInvalidator::class),
-            normalizer: $this->app->make(StoryblokSlugNormalizer::class),
             cacheNamespace: config('tafer.storyblok.cache.namespace', 'default'),
         ));
     }

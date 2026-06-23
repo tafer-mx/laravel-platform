@@ -4,7 +4,6 @@ namespace TAFER\Core\Contracts;
 
 use TAFER\Core\Storyblok\CachedStory;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
-use TAFER\Core\Storyblok\StoryblokCacheEntry;
 use TAFER\Core\Storyblok\StoryblokIdentity;
 
 interface StoryblokCache extends StoryblokCacheInvalidator
@@ -19,6 +18,6 @@ interface StoryblokCache extends StoryblokCacheInvalidator
         StoryblokIdentity $identity,
         CachedStory $story,
         StoryblokCacheContext $context,
-        StoryblokCacheEntry $entry = StoryblokCacheEntry::Story,
+        bool $isRelation = false,
     ): void;
 }

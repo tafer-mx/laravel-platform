@@ -10,7 +10,6 @@ final readonly class StoryblokWebhookInvalidator
 {
     public function __construct(
         private StoryblokCacheInvalidator $cache,
-        private StoryblokSlugNormalizer $normalizer,
         private string $cacheNamespace = 'default',
     ) {}
 
@@ -19,10 +18,12 @@ final readonly class StoryblokWebhookInvalidator
         ?Locale $locale = null,
         ?string $uuid = null,
     ): StoryblokInvalidationResult {
-        $locale ??= $this->normalizer->localeFromSlug($fullSlug);
-        $identity = $this->normalizer
-            ->fromSlug($fullSlug, $locale)
-            ->withUuid($uuid);
+        $locale ??= $this->localeFromSlug($fullSlug);
+        $identity = new StoryblokIdentity(
+            canonicalSlug: $this->canonicalSlug($fullSlug),
+            locale: $locale,
+            uuid: $uuid,
+        );
 
         return $this->cache->invalidate(
             $identity,
@@ -47,5 +48,26 @@ final readonly class StoryblokWebhookInvalidator
         }
 
         return $results;
+    }
+
+    private function localeFromSlug(string $slug, Locale $fallback = Locale::English): Locale
+    {
+        $firstSegment = explode('/', trim($slug, '/'))[0] ?? '';
+
+        return Locale::tryFrom($firstSegment) ?? $fallback;
+    }
+
+    private function canonicalSlug(string $slug): string
+    {
+        $segments = array_values(array_filter(
+            explode('/', trim($slug, '/')),
+            static fn (string $segment): bool => $segment !== '',
+        ));
+
+        if ($segments !== [] && Locale::tryFrom($segments[0]) !== null) {
+            array_shift($segments);
+        }
+
+        return implode('/', $segments);
     }
 }
