@@ -399,42 +399,35 @@ No existe una opción para cachear drafts.
 
 ## Webhooks
 
-La app host conserva su endpoint y validación del webhook. El paquete ofrece
-`StoryblokWebhookInvalidator` para la traducción a identidad e invalidación.
+El paquete incluye un controller reutilizable para que todas las apps compartan
+la misma traducción del payload de Storyblok a invalidación de caché. La app host
+solo registra la ruta y decide su URL pública.
 
 ```php
-use TAFER\Core\Enums\Locale;
-use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
+use Illuminate\Support\Facades\Route;
+use TAFER\Core\Http\Controllers\StoryblokWebhookController;
 
-final class StoryblokWebhookController
+Route::post('/storyblok/webhook', StoryblokWebhookController::class);
+```
+
+Como Storyblok hace el `POST` desde fuera de la sesión Laravel, esa ruta debe
+quedar fuera de CSRF en la app host.
+
+El controller entiende el payload estándar de Storyblok:
+
+```json
 {
-    public function __invoke(
-        Request $request,
-        StoryblokWebhookInvalidator $invalidator,
-    ): JsonResponse {
-        $data = $request->validate([
-            'full_slug' => ['required', 'string'],
-            'full_slug__i18n__es' => ['sometimes'],
-        ]);
-
-        $locales = array_key_exists('full_slug__i18n__es', $data)
-            ? [Locale::English, Locale::Spanish]
-            : [str_starts_with($data['full_slug'], 'es/')
-                ? Locale::Spanish
-                : Locale::English];
-
-        $results = $invalidator->invalidateLocales(
-            $data['full_slug'],
-            $locales,
-        );
-
-        return response()->json([
-            'message' => 'Cache invalidated',
-            'results' => $results,
-        ]);
-    }
+  "text": "The user published the Story config_brand_puerto-vallarta (...)",
+  "action": "published",
+  "space_id": 285826016720786,
+  "story_id": 87702217043285,
+  "full_slug": "brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta",
+  "full_slug__i18n__es": "es/brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta"
 }
 ```
+
+Si llega `full_slug__i18n__es`, invalida `en` y `es`. Si no llega, resuelve el
+locale desde `full_slug`.
 
 `StoryblokInvalidationResult` diferencia:
 

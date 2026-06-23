@@ -8,16 +8,13 @@ Shared logic for TAFER Laravel projects.
 
 See [Storyblok cache architecture](docs/storyblok-cache.md) for configuration, request flow, webhook invalidation, and extension points.
 
-Run the deterministic workbench example:
+Run the real Storyblok workbench:
 
 ```bash
 composer serve
 ```
 
-Then open [http://localhost:6969/es/puerto-vallarta/storyblok-cache-demo](http://localhost:6969/es/puerto-vallarta/storyblok-cache-demo).
-
-For a real Storyblok request, configure the workbench environment and open the public
-slug. For example:
+Configure the workbench environment and open the public slug. For example:
 
 ```dotenv
 TAFER_BRAND_SLUG=villa-palmar-cancun
@@ -26,6 +23,35 @@ STORYBLOK_CACHE_ENABLED=true
 ```
 
 Then open [http://localhost:6969/home-villa-palmar-cancun](http://localhost:6969/home-villa-palmar-cancun).
+The workbench converts that public URL into the Storyblok slug
+`brands/villa-palmar-cancun/home-villa-palmar-cancun` through `RequestCtx`.
+
+To test cache invalidation from a Storyblok webhook in the workbench, post the
+webhook payload to:
+
+```text
+POST http://localhost:6969/storyblok/webhook
+```
+
+Example:
+
+```bash
+curl -X POST http://localhost:6969/storyblok/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"text":"The user published the Story Home","action":"published","space_id":285826016720786,"story_id":173251456956919,"full_slug":"brands/villa-palmar-cancun/home-villa-palmar-cancun","full_slug__i18n__es":"es/brands/villa-palmar-cancun/home-villa-palmar-cancun"}'
+```
+
+Host apps can reuse the package controller directly:
+
+```php
+use Illuminate\Support\Facades\Route;
+use TAFER\Core\Http\Controllers\StoryblokWebhookController;
+
+Route::post('/storyblok/webhook', StoryblokWebhookController::class);
+```
+
+Because Storyblok posts from outside the Laravel session, exclude this route
+from CSRF verification in the host app.
 
 ---
 
