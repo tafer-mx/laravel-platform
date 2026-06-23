@@ -4,6 +4,20 @@ Shared logic for TAFER Laravel projects.
 
 ---
 
+## Storyblok
+
+See [Storyblok cache architecture](docs/storyblok-cache.md) for configuration, request flow, webhook invalidation, and extension points.
+
+Run the deterministic workbench example:
+
+```bash
+composer serve
+```
+
+Then open [http://localhost:6969/storyblok-cache-demo](http://localhost:6969/storyblok-cache-demo).
+
+---
+
 ## Workflow & Releases
 
 ### Branch Strategy

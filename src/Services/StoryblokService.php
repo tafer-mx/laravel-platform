@@ -6,8 +6,9 @@ use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
 use Storyblok\Api\StoriesApiInterface;
+use TAFER\Core\Contracts\StoryblokGateway;
 
-class StoryblokService
+class StoryblokService implements StoryblokGateway
 {
     public function __construct(
         protected StoriesApiInterface $storiesApi,

@@ -6,6 +6,7 @@ use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
 use TAFER\Core\Phones\GarzaBlancaPhoneDirectory;
+use Workbench\App\Http\Controllers\StoryblokCacheDemoController;
 
 Route::get('/', function () {
     return redirect('/hello-world');
@@ -23,3 +24,5 @@ Route::get('/phones', function () {
         'phones' => $directory->get(Location::Cancun, Locale::English, Device::Desktop),
     ]);
 });
+
+Route::get('/storyblok-cache-demo', StoryblokCacheDemoController::class);

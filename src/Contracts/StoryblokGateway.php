@@ -1,0 +1,14 @@
+<?php
+
+namespace TAFER\Core\Contracts;
+
+use Storyblok\Api\Domain\Value\Uuid;
+use Storyblok\Api\Request\StoryRequest;
+use Storyblok\Api\Response\StoryResponse;
+
+interface StoryblokGateway
+{
+    public function getStory(string $slug, ?StoryRequest $request = null): StoryResponse;
+
+    public function getStoryByUuid(string|Uuid $uuid, ?StoryRequest $request = null): StoryResponse;
+}

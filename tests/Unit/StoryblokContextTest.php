@@ -1,0 +1,77 @@
+<?php
+
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
+use Storyblok\Api\Domain\Value\Dto\Version;
+use TAFER\Core\Enums\Locale;
+use TAFER\Core\Enums\Location;
+use TAFER\Core\Enums\Resort;
+use TAFER\Core\Storyblok\CachedStory;
+use TAFER\Core\Storyblok\LaravelStoryblokCache;
+use TAFER\Core\Storyblok\StoryblokCacheContext;
+use TAFER\Core\Storyblok\StoryblokCacheKey;
+use TAFER\Core\Storyblok\StoryblokIdentity;
+use TAFER\Core\Storyblok\StoryblokPath;
+use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
+use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
+
+it('normalizes locale-prefixed Storyblok slugs', function () {
+    $normalizer = new StoryblokSlugNormalizer;
+
+    expect($normalizer->canonicalSlug('/es/brands/mousai/puerto-vallarta/suites/'))
+        ->toBe('brands/mousai/puerto-vallarta/suites')
+        ->and($normalizer->localeFromSlug('es/brands/mousai'))
+        ->toBe(Locale::Spanish)
+        ->and($normalizer->localeFromSlug('brands/mousai'))
+        ->toBe(Locale::English);
+});
+
+it('builds resort paths from the package enums', function () {
+    expect(StoryblokPath::forResort(
+        Resort::HotelMousai,
+        Location::PuertoVallarta,
+        'suites',
+    ))->toBe('brands/mousai/puerto-vallarta/suites');
+});
+
+it('invalidates both locales when a webhook reports both translations', function () {
+    $repository = new Repository(new ArrayStore);
+    $cache = new LaravelStoryblokCache(
+        $repository,
+        new StoryblokCacheKey('test:storyblok'),
+    );
+    $normalizer = new StoryblokSlugNormalizer;
+    $webhook = new StoryblokWebhookInvalidator($cache, $normalizer);
+    $uuid = '550e8400-e29b-41d4-a716-446655440001';
+
+    foreach (Locale::cases() as $locale) {
+        $context = new StoryblokCacheContext($locale, Version::Published);
+        $identity = new StoryblokIdentity('relations/suite', $locale, $uuid);
+        $cache->put(
+            $identity,
+            CachedStory::fromRelation([
+                'uuid' => $uuid,
+                'full_slug' => $locale === Locale::Spanish
+                    ? 'es/relations/suite'
+                    : 'relations/suite',
+            ], 1),
+            $context,
+        );
+    }
+
+    $results = $webhook->invalidateLocales(
+        'es/relations/suite',
+        [Locale::English, Locale::Spanish],
+    );
+
+    expect($results['en']->successful())->toBeTrue()
+        ->and($results['es']->successful())->toBeTrue()
+        ->and($cache->getByUuid(
+            $uuid,
+            new StoryblokCacheContext(Locale::English, Version::Published),
+        ))->toBeNull()
+        ->and($cache->getByUuid(
+            $uuid,
+            new StoryblokCacheContext(Locale::Spanish, Version::Published),
+        ))->toBeNull();
+});
