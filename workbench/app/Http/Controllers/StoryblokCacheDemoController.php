@@ -8,30 +8,24 @@ use Illuminate\Http\JsonResponse;
 use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
+use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
-use TAFER\Core\Enums\Location;
-use TAFER\Core\Enums\Resort;
 use TAFER\Core\Services\CachedStoryblokService;
 use TAFER\Core\Storyblok\ImmediateDeferredExecutor;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
-use TAFER\Core\Storyblok\StoryblokPath;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
 use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
 
 final class StoryblokCacheDemoController
 {
-    public function __invoke(): JsonResponse
+    public function __invoke(RequestCtx $requestContext): JsonResponse
     {
-        $parentSlug = StoryblokPath::forResort(
-            Resort::HotelMousai,
-            Location::PuertoVallarta,
-            'suites',
-        );
-        $relationSlug = StoryblokPath::join($parentSlug, 'north-suite');
+        $parentSlug = $requestContext->storyblokSlug();
+        $relationSlug = "{$parentSlug}/north-suite";
         $relationUuid = '550e8400-e29b-41d4-a716-446655440001';
         $origin = $this->fakeOrigin($parentSlug, $relationSlug, $relationUuid);
         $cache = new LaravelStoryblokCache(
@@ -50,7 +44,7 @@ final class StoryblokCacheDemoController
             policy: new StoryblokCachePolicy,
             cacheNamespace: 'workbench',
         );
-        $request = new StoryRequest(language: Locale::Spanish->value);
+        $request = new StoryRequest(language: $requestContext->locale->value);
 
         $firstParent = $service->getStory("es/{$parentSlug}", $request);
         $secondParent = $service->getStory($parentSlug, $request);
@@ -71,9 +65,10 @@ final class StoryblokCacheDemoController
 
         return response()->json([
             'scenario' => [
-                'locale' => Locale::Spanish->value,
-                'resort' => Resort::HotelMousai->value,
-                'location' => Location::PuertoVallarta->value,
+                'locale' => $requestContext->locale->value,
+                'resort' => $requestContext->resort->value,
+                'location' => $requestContext->location->value,
+                'public_slug' => $requestContext->slug,
                 'canonical_parent_slug' => $parentSlug,
                 'canonical_relation_slug' => $relationSlug,
             ],

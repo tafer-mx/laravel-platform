@@ -14,7 +14,18 @@ Run the deterministic workbench example:
 composer serve
 ```
 
-Then open [http://localhost:6969/storyblok-cache-demo](http://localhost:6969/storyblok-cache-demo).
+Then open [http://localhost:6969/es/puerto-vallarta/storyblok-cache-demo](http://localhost:6969/es/puerto-vallarta/storyblok-cache-demo).
+
+For a real Storyblok request, configure the workbench environment and open the public
+slug. For example:
+
+```dotenv
+TAFER_BRAND_SLUG=villa-palmar-cancun
+STORYBLOK_TOKEN=your_public_token
+STORYBLOK_CACHE_ENABLED=true
+```
+
+Then open [http://localhost:6969/home-villa-palmar-cancun](http://localhost:6969/home-villa-palmar-cancun).
 
 ---
 

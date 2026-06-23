@@ -259,7 +259,6 @@ it('Must return an empty collection when data is unset', function () {
 
     $reviews = $service->getByHotel($hotelRegion, Locale::English);
 
-    dump($reviews);
     expect($reviews)
         ->toBeInstanceOf(Collection::class)
         ->toBeEmpty();

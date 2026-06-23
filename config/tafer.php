@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'brand' => [
+        'slug' => env('TAFER_BRAND_SLUG', ''),
+    ],
+
     'middleware' => [
         'base_url' => env('TAFER_MIDDLEWARE_BASE_URL'),
         'reviews' => [

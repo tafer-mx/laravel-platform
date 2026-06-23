@@ -186,6 +186,56 @@ está habilitado, resuelve `CachedStoryblokService`.
 
 Inyectar directamente `StoryblokService` omite el decorador y, por tanto, el caché.
 
+## Integración con RequestCtx
+
+Las aplicaciones que concentran todas sus páginas en un controlador pueden registrar
+`ResolveRequestCtx` en la ruta catch-all. El middleware resuelve una sola vez:
+
+- `Resort` desde `TAFER_BRAND_SLUG`;
+- `Locale` desde el primer segmento `en` o `es`;
+- `Location` desde los segmentos públicos;
+- slug público sin locale;
+- preview mediante `_storyblok`;
+- dispositivo.
+
+El controlador no reconstruye estos datos:
+
+```php
+final readonly class PageController
+{
+    public function __construct(
+        private StoryblokGateway $storyblok,
+        private StoryblokRequestFactory $requests,
+    ) {}
+
+    public function __invoke(RequestCtx $context): JsonResponse
+    {
+        $response = $this->storyblok->getStory(
+            $context->storyblokSlug(),
+            $context->storyblokRequest($this->requests),
+        );
+
+        return response()->json($response->story);
+    }
+}
+```
+
+Ejemplos de traducción:
+
+```text
+Resort:     villa-palmar-cancun
+URL:        /home-villa-palmar-cancun
+Storyblok:  brands/villa-palmar-cancun/home-villa-palmar-cancun
+
+Resort:     mousai
+URL:        /es/puerto-vallarta/suites
+Storyblok:  brands/mousai/puerto-vallarta/suites
+Locale:     es
+```
+
+`storyblokSlug()` omite la ubicación sintética `corp` y evita duplicar la ubicación
+cuando ya aparece en el slug público.
+
 ## Flujo de lectura por slug
 
 ```mermaid

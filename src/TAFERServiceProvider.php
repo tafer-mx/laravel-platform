@@ -11,6 +11,7 @@ use Storyblok\Api\StoriesApi;
 use Storyblok\Api\StoriesApiInterface;
 use Storyblok\Api\StoryblokClient;
 use Storyblok\Api\StoryblokClientInterface;
+use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Contracts\DeferredExecutor;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Contracts\StoryblokCache;
@@ -39,6 +40,10 @@ class TAFERServiceProvider extends ServiceProvider
         if (is_array($applicationRelations)) {
             config(['tafer.storyblok.resolve_relations' => $applicationRelations]);
         }
+
+        $this->app->scoped(RequestCtx::class, fn () => new RequestCtx(
+            config('tafer.brand.slug', ''),
+        ));
 
         $this->app->singleton(ReviewClient::class, fn () => new ReviewsService(
             new Client([

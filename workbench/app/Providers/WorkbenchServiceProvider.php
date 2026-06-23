@@ -11,7 +11,9 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        config([
+            'tafer.brand.slug' => env('TAFER_BRAND_SLUG', 'mousai'),
+        ]);
     }
 
     /**

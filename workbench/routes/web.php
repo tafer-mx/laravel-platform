@@ -5,8 +5,10 @@ use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
+use TAFER\Core\Middlewares\ResolveRequestCtx;
 use TAFER\Core\Phones\GarzaBlancaPhoneDirectory;
 use Workbench\App\Http\Controllers\StoryblokCacheDemoController;
+use Workbench\App\Http\Controllers\StoryblokPageController;
 
 Route::get('/', function () {
     return redirect('/hello-world');
@@ -25,4 +27,11 @@ Route::get('/phones', function () {
     ]);
 });
 
-Route::get('/storyblok-cache-demo', StoryblokCacheDemoController::class);
+Route::get(
+    '/es/puerto-vallarta/storyblok-cache-demo',
+    StoryblokCacheDemoController::class,
+)->middleware(ResolveRequestCtx::class);
+
+Route::get('/{slug?}', StoryblokPageController::class)
+    ->where('slug', '.*')
+    ->middleware(ResolveRequestCtx::class);
