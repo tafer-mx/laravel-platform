@@ -11,7 +11,6 @@ use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Enums\Resort;
-use TAFER\Core\Storyblok\StoryblokPath;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
 
 /**
@@ -86,12 +85,12 @@ class RequestCtx
             $slug = ltrim(substr($slug, strlen($location)), '/');
         }
 
-        return StoryblokPath::join(
-            $root,
-            $this->resort->value,
-            $location,
-            $slug,
-        );
+        $segments = [$root, $this->resort->value, $location, $slug];
+
+        return implode('/', array_values(array_filter(
+            array_map(static fn (string $segment): string => trim($segment, '/'), $segments),
+            static fn (string $segment): bool => $segment !== '',
+        )));
     }
 
     public function storyblokRequest(StoryblokRequestFactory $factory): StoryRequest

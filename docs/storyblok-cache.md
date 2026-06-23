@@ -67,7 +67,7 @@ classDiagram
 | `LaravelStoryblokCache` | Guardar payload e índices bidireccionales en Laravel Cache. |
 | `DeferredExecutor` | Posponer y deduplicar escrituras mediante Laravel `defer()`. |
 | `StoryblokWebhookInvalidator` | Convertir un webhook en una invalidación publicada. |
-| `StoryblokPath` | Construir rutas con los enums `Resort` y `Location`. |
+| `RequestCtx::storyblokSlug()` | Traducir la petición actual al path interno usado por Storyblok. |
 
 ## Identidad y normalización
 
@@ -94,28 +94,20 @@ locale:              Locale::Spanish
 
 El locale forma parte de la identidad aunque el UUID y el slug base coincidan.
 
-## Construcción de paths con enums
+## Construcción del path desde `RequestCtx`
 
-Las aplicaciones pueden seguir construyendo su contexto HTTP, pero no necesitan repetir la
-estructura interna de Storyblok:
+Las aplicaciones no necesitan repetir la estructura interna de Storyblok en cada
+controller. El middleware resuelve `RequestCtx` una sola vez y `storyblokSlug()`
+traduce esa petición al path CMS:
 
 ```php
-use TAFER\Core\Enums\Location;
-use TAFER\Core\Enums\Resort;
-use TAFER\Core\Storyblok\StoryblokPath;
-
-$slug = StoryblokPath::forResort(
-    Resort::HotelMousai,
-    Location::PuertoVallarta,
-    'suites',
-);
+$slug = $requestCtx->storyblokSlug();
 
 // brands/mousai/puerto-vallarta/suites
 ```
 
-El caché no interpreta marcas ni destinos. Recibe el path final y usa `Locale` para
-normalizarlo. Esto permite que una aplicación use un root diferente mediante el cuarto
-argumento de `forResort()`, o construya un path genérico con `StoryblokPath::join()`.
+El caché no interpreta marcas ni destinos. Recibe el path final y usa `Locale`
+para normalizarlo.
 
 ## Configuración
 

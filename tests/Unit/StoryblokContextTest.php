@@ -4,14 +4,11 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Storyblok\Api\Domain\Value\Dto\Version;
 use TAFER\Core\Enums\Locale;
-use TAFER\Core\Enums\Location;
-use TAFER\Core\Enums\Resort;
 use TAFER\Core\Storyblok\CachedStory;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheContext;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokIdentity;
-use TAFER\Core\Storyblok\StoryblokPath;
 use TAFER\Core\Storyblok\StoryblokSlugNormalizer;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
 
@@ -24,14 +21,6 @@ it('normalizes locale-prefixed Storyblok slugs', function () {
         ->toBe(Locale::Spanish)
         ->and($normalizer->localeFromSlug('brands/mousai'))
         ->toBe(Locale::English);
-});
-
-it('builds resort paths from the package enums', function () {
-    expect(StoryblokPath::forResort(
-        Resort::HotelMousai,
-        Location::PuertoVallarta,
-        'suites',
-    ))->toBe('brands/mousai/puerto-vallarta/suites');
 });
 
 it('invalidates both locales when a webhook reports both translations', function () {
