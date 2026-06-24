@@ -86,3 +86,125 @@ it('invalidates both locales from a Storyblok webhook payload', function () {
             new StoryblokCacheContext(Locale::Spanish, Version::Published),
         ))->toBeNull();
 });
+
+it('invalidates only English from a single locale Storyblok webhook payload', function () {
+    $this->withoutMiddleware(VerifyCsrfToken::class);
+
+    app()->singleton(StoryblokCache::class, fn () => new LaravelStoryblokCache(
+        new Repository(new ArrayStore),
+        new StoryblokCacheKey('test:storyblok'),
+    ));
+    app()->singleton(
+        StoryblokCacheInvalidator::class,
+        fn () => app(StoryblokCache::class),
+    );
+    app()->singleton(
+        StoryblokWebhookInvalidator::class,
+        fn () => new StoryblokWebhookInvalidator(
+            app(StoryblokCacheInvalidator::class),
+        ),
+    );
+
+    Route::post('/storyblok/webhook-single-en-test', StoryblokWebhookController::class);
+
+    $cache = app(StoryblokCache::class);
+    $uuid = '550e8400-e29b-41d4-a716-446655440001';
+    $slug = 'brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta';
+
+    foreach ([Locale::English, Locale::Spanish] as $locale) {
+        $cache->put(
+            new StoryblokIdentity($slug, $locale, $uuid),
+            CachedStory::fromRelation([
+                'uuid' => $uuid,
+                'full_slug' => $locale === Locale::Spanish ? 'es/'.$slug : $slug,
+            ], 1),
+            new StoryblokCacheContext($locale, Version::Published),
+        );
+    }
+
+    $response = $this->postJson('/storyblok/webhook-single-en-test', [
+        'text' => "The user published the Story config_brand_puerto-vallarta ({$slug})",
+        'action' => 'published',
+        'space_id' => 285826016720786,
+        'story_id' => 87702217043285,
+        'full_slug' => $slug,
+    ]);
+
+    $response
+        ->assertOk()
+        ->assertJsonPath('both_languages', false)
+        ->assertJsonPath('languages', ['en'])
+        ->assertJsonPath('delete_results.en.successful', true)
+        ->assertJsonPath('delete_results.en.payload_existed', true)
+        ->assertJsonMissingPath('delete_results.es');
+
+    expect($cache->get(
+        new StoryblokIdentity($slug, Locale::English),
+        new StoryblokCacheContext(Locale::English, Version::Published),
+    ))->toBeNull()
+        ->and($cache->get(
+            new StoryblokIdentity($slug, Locale::Spanish),
+            new StoryblokCacheContext(Locale::Spanish, Version::Published),
+        ))->not->toBeNull();
+});
+
+it('invalidates only Spanish from a single locale Storyblok webhook payload', function () {
+    $this->withoutMiddleware(VerifyCsrfToken::class);
+
+    app()->singleton(StoryblokCache::class, fn () => new LaravelStoryblokCache(
+        new Repository(new ArrayStore),
+        new StoryblokCacheKey('test:storyblok'),
+    ));
+    app()->singleton(
+        StoryblokCacheInvalidator::class,
+        fn () => app(StoryblokCache::class),
+    );
+    app()->singleton(
+        StoryblokWebhookInvalidator::class,
+        fn () => new StoryblokWebhookInvalidator(
+            app(StoryblokCacheInvalidator::class),
+        ),
+    );
+
+    Route::post('/storyblok/webhook-single-es-test', StoryblokWebhookController::class);
+
+    $cache = app(StoryblokCache::class);
+    $uuid = '550e8400-e29b-41d4-a716-446655440001';
+    $slug = 'brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta';
+
+    foreach ([Locale::English, Locale::Spanish] as $locale) {
+        $cache->put(
+            new StoryblokIdentity($slug, $locale, $uuid),
+            CachedStory::fromRelation([
+                'uuid' => $uuid,
+                'full_slug' => $locale === Locale::Spanish ? 'es/'.$slug : $slug,
+            ], 1),
+            new StoryblokCacheContext($locale, Version::Published),
+        );
+    }
+
+    $response = $this->postJson('/storyblok/webhook-single-es-test', [
+        'text' => "The user published the Story config_brand_puerto-vallarta (es/{$slug})",
+        'action' => 'published',
+        'space_id' => 285826016720786,
+        'story_id' => 87702217043285,
+        'full_slug' => 'es/'.$slug,
+    ]);
+
+    $response
+        ->assertOk()
+        ->assertJsonPath('both_languages', false)
+        ->assertJsonPath('languages', ['es'])
+        ->assertJsonPath('delete_results.es.successful', true)
+        ->assertJsonPath('delete_results.es.payload_existed', true)
+        ->assertJsonMissingPath('delete_results.en');
+
+    expect($cache->get(
+        new StoryblokIdentity($slug, Locale::Spanish),
+        new StoryblokCacheContext(Locale::Spanish, Version::Published),
+    ))->toBeNull()
+        ->and($cache->get(
+            new StoryblokIdentity($slug, Locale::English),
+            new StoryblokCacheContext(Locale::English, Version::Published),
+        ))->not->toBeNull();
+});
