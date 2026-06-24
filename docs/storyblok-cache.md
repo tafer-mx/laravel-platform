@@ -215,6 +215,14 @@ Resort:     villa-palmar-cancun
 URL:        /home-villa-palmar-cancun
 Storyblok:  brands/villa-palmar-cancun/home-villa-palmar-cancun
 
+Resort:     villa-palmar-cancun
+URL:        /
+Storyblok:  brands/villa-palmar-cancun/home-villa-palmar-cancun
+
+Resort:     garza-blanca
+URL:        /puerto-vallarta
+Storyblok:  brands/garza-blanca/puerto-vallarta/home-puerto-vallarta
+
 Resort:     mousai
 URL:        /es/puerto-vallarta/suites
 Storyblok:  brands/mousai/puerto-vallarta/suites
@@ -222,7 +230,8 @@ Locale:     es
 ```
 
 `storyblokSlug()` omite la ubicación sintética `corp` y evita duplicar la ubicación
-cuando ya aparece en el slug público.
+cuando ya aparece en el slug público. Para rutas raíz aplica el prefijo `home-*`
+que Storyblok usa para los homes de marca o destino.
 
 ## Flujo de lectura por slug
 

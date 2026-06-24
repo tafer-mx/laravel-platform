@@ -74,7 +74,8 @@ class RequestCtx
     /**
      * Build the canonical Storyblok path for the current request.
      *
-     * Corporate/root sites omit the synthetic "corp" segment.
+     * Corporate/root sites omit the synthetic "corp" segment. Root pages use
+     * Storyblok's home-* prefix convention.
      */
     public function storyblokSlug(string $root = 'brands'): string
     {
@@ -83,6 +84,12 @@ class RequestCtx
 
         if ($location !== '' && ($slug === $location || str_starts_with($slug, "{$location}/"))) {
             $slug = ltrim(substr($slug, strlen($location)), '/');
+        }
+
+        if ($slug === '') {
+            $slug = $location === ''
+                ? "home-{$this->resort->value}"
+                : "home-{$location}";
         }
 
         $segments = [$root, $this->resort->value, $location, $slug];

@@ -69,7 +69,7 @@ it('builds the internal Storyblok slug without duplicating location', function (
         ->toBe('brands/mousai/puerto-vallarta/suites');
 });
 
-it('builds corporate Storyblok paths without a corp segment', function () {
+it('builds explicit corporate Storyblok paths without a corp segment', function () {
     $requestCtx = (new RequestCtx('villa-palmar-cancun'))
         ->setLocale(Locale::English)
         ->setLocation(Location::Corp)
@@ -79,6 +79,30 @@ it('builds corporate Storyblok paths without a corp segment', function () {
 
     expect($requestCtx->storyblokSlug())
         ->toBe('brands/villa-palmar-cancun/home-villa-palmar-cancun');
+});
+
+it('builds corporate home Storyblok paths from root requests', function () {
+    $requestCtx = (new RequestCtx('villa-palmar-cancun'))
+        ->setLocale(Locale::English)
+        ->setLocation(Location::Corp)
+        ->setSlug('/')
+        ->setIsPreview(false)
+        ->setDevice(Device::Desktop);
+
+    expect($requestCtx->storyblokSlug())
+        ->toBe('brands/villa-palmar-cancun/home-villa-palmar-cancun');
+});
+
+it('builds location home Storyblok paths from location root requests', function () {
+    $requestCtx = (new RequestCtx('garza-blanca'))
+        ->setLocale(Locale::English)
+        ->setLocation(Location::PuertoVallarta)
+        ->setSlug('puerto-vallarta')
+        ->setIsPreview(false)
+        ->setDevice(Device::Desktop);
+
+    expect($requestCtx->storyblokSlug())
+        ->toBe('brands/garza-blanca/puerto-vallarta/home-puerto-vallarta');
 });
 
 it('builds a draft Storyblok request for preview mode', function () {
