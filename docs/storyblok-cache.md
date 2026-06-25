@@ -10,10 +10,10 @@ Esta capa replica en el paquete el flujo usado por las aplicaciones TAFER:
 - considera al webhook de cada story como la autoridad de invalidación;
 - reutiliza los enums `Locale`, `Resort` y `Location` del paquete.
 
-La configuración predeterminada vive en el paquete con valores neutros. Cada
-aplicación debe publicarla y sobrescribirla mediante su propio `config/tafer.php`.
-Si una app quiere leer de `.env`, lo hace en su config publicado, no en el config
-base del paquete.
+La configuración predeterminada vive en el paquete con valores comunes no
+sensibles. Cada aplicación debe publicarla y sobrescribirla mediante su propio
+`config/tafer.php`. Si una app quiere leer de `.env`, lo hace en su config
+publicado, no en el config base del paquete.
 
 ## Arquitectura
 

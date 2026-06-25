@@ -2,7 +2,7 @@
 
 return [
     'brand' => [
-        'slug' => '',
+        'slug' => 'mousai',
     ],
 
     'middleware' => [
@@ -34,12 +34,12 @@ return [
         ],
 
         'cache' => [
-            'enabled' => false,
-            'store' => null,
+            'enabled' => true,
+            'store' => 'database',
             'story_ttl' => 0,
             'relation_ttl' => 0,
             'prefix' => 'tafer:storyblok',
-            'namespace' => 'default',
+            'namespace' => 'mousai',
         ],
     ],
 ];

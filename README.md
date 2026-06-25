@@ -130,7 +130,8 @@ return [
 ];
 ```
 
-The package config ships with neutral defaults. Each app decides whether its
+The package config ships with the common non-sensitive defaults used by TAFER
+apps. Each app should override its brand/cache namespace and decide whether its
 published config uses fixed values or reads from that app's `.env`.
 
 Set `STORYBLOK_CACHE_ENABLED=false` to use the raw `StoryblokService` without
