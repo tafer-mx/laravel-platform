@@ -10,8 +10,10 @@ Esta capa replica en el paquete el flujo usado por las aplicaciones TAFER:
 - considera al webhook de cada story como la autoridad de invalidación;
 - reutiliza los enums `Locale`, `Resort` y `Location` del paquete.
 
-La configuración predeterminada vive en el paquete. Cada aplicación puede publicarla y
-sobrescribirla mediante su propio `config/tafer.php` y `.env`.
+La configuración predeterminada vive en el paquete con valores neutros. Cada
+aplicación debe publicarla y sobrescribirla mediante su propio `config/tafer.php`.
+Si una app quiere leer de `.env`, lo hace en su config publicado, no en el config
+base del paquete.
 
 ## Arquitectura
 
@@ -113,17 +115,27 @@ Publicar la configuración en cada aplicación:
 php artisan vendor:publish --tag=tafer-config
 ```
 
-Variables principales:
+Valores principales que cada app host debe sobrescribir en `config/tafer.php`:
 
-```dotenv
-STORYBLOK_CACHE_ENABLED=true
-STORYBLOK_CACHE_STORE=database
-STORYBLOK_CACHE_STORY_TTL=0
-STORYBLOK_CACHE_RELATION_TTL=0
-STORYBLOK_CACHE_PREFIX=tafer:storyblok
-STORYBLOK_CACHE_NAMESPACE=mousai
-STORYBLOK_DEFAULT_LOCALE=en
-STORYBLOK_RESOLVE_LINKS=url
+```php
+'brand' => [
+    'slug' => 'mousai',
+],
+
+'storyblok' => [
+    'token' => env('STORYBLOK_TOKEN'),
+    'default_locale' => 'en',
+    'resolve_links' => 'url',
+
+    'cache' => [
+        'enabled' => true,
+        'store' => 'database',
+        'story_ttl' => 0,
+        'relation_ttl' => 0,
+        'prefix' => 'tafer:storyblok',
+        'namespace' => 'mousai',
+    ],
+],
 ```
 
 Un TTL igual a `0` significa `forever`, reproduciendo el comportamiento actual. Cada app

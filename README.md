@@ -104,26 +104,38 @@ Publish the config into each host app:
 php artisan vendor:publish --tag=tafer-config
 ```
 
-Then configure the host `.env`:
+Then override the values in the host app's published `config/tafer.php`:
 
-```dotenv
-TAFER_BRAND_SLUG=villa-palmar-cancun
+```php
+return [
+    'brand' => [
+        'slug' => 'villa-palmar-cancun',
+    ],
 
-STORYBLOK_TOKEN=your_public_token
-STORYBLOK_VERSION=published
-STORYBLOK_DEFAULT_LOCALE=en
-STORYBLOK_RESOLVE_LINKS=url
+    'storyblok' => [
+        'token' => env('STORYBLOK_TOKEN'),
+        'version' => 'published',
+        'default_locale' => 'en',
+        'resolve_links' => 'url',
 
-STORYBLOK_CACHE_ENABLED=true
-STORYBLOK_CACHE_STORE=database
-STORYBLOK_CACHE_STORY_TTL=0
-STORYBLOK_CACHE_RELATION_TTL=0
-STORYBLOK_CACHE_PREFIX=tafer:storyblok
-STORYBLOK_CACHE_NAMESPACE=villa-palmar-cancun
+        'cache' => [
+            'enabled' => true,
+            'store' => 'database',
+            'story_ttl' => 0,
+            'relation_ttl' => 0,
+            'prefix' => 'tafer:storyblok',
+            'namespace' => 'villa-palmar-cancun',
+        ],
+    ],
+];
 ```
 
+The package config ships with neutral defaults. Each app decides whether its
+published config uses fixed values or reads from that app's `.env`.
+
 Set `STORYBLOK_CACHE_ENABLED=false` to use the raw `StoryblokService` without
-the cache decorator.
+the cache decorator if your app config maps that value from `.env`; otherwise set
+`'storyblok.cache.enabled' => false` directly in the host config.
 
 ### Webhook invalidation
 
