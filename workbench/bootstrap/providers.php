@@ -1,5 +1,7 @@
 <?php
 
+use Workbench\App\Providers\WorkbenchServiceProvider;
+
 return [
-    Workbench\App\Providers\WorkbenchServiceProvider::class,
+    WorkbenchServiceProvider::class,
 ];
