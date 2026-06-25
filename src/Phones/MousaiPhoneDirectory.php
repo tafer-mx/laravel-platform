@@ -15,7 +15,6 @@ use TAFER\Core\Records\PhoneNumber;
  */
 final readonly class MousaiPhoneDirectory extends PhoneDirectory implements ResortPhoneDirectory
 {
-
     public function resort(): Resort
     {
         return Resort::HotelMousai;

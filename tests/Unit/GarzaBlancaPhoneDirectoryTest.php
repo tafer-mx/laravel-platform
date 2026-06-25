@@ -8,9 +8,9 @@ use TAFER\Core\Phones\GarzaBlancaPhoneDirectory;
 use TAFER\Core\Records\PhoneNumber;
 
 describe('GBCN Phone Directory', function () {
-    describe('English', function(){
+    describe('English', function () {
         it('gets the Cancun English desktop phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -25,7 +25,7 @@ describe('GBCN Phone Directory', function () {
         });
 
         it('gets the Cancun English mobile phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -40,7 +40,7 @@ describe('GBCN Phone Directory', function () {
         });
 
         it('gets the Cancun English email campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -55,7 +55,7 @@ describe('GBCN Phone Directory', function () {
         });
 
         it('gets the Cancun English FADS campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -70,7 +70,7 @@ describe('GBCN Phone Directory', function () {
         });
 
         it('gets the Cancun English GADS campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -83,11 +83,11 @@ describe('GBCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+14452134644')
                 ->and($phone->buttonText)->toBe('+1 445 213 4644');
         });
-   });
+    });
 
-   describe('Spanish', function () {
+    describe('Spanish', function () {
         it('gets the Cancun Spanish desktop phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -102,7 +102,7 @@ describe('GBCN Phone Directory', function () {
         });
 
         it('gets the Cancun Spanish mobile phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -115,13 +115,13 @@ describe('GBCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+528006490462')
                 ->and($phone->buttonText)->toBe('+52 800 649 0462');
         });
-   });
+    });
 });
 
 describe('GBPV Phone Directory', function () {
     describe('English', function () {
         it('gets the Puerto Vallarta English desktop phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -136,7 +136,7 @@ describe('GBPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Mobile phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -151,7 +151,7 @@ describe('GBPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Email phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -164,9 +164,9 @@ describe('GBPV Phone Directory', function () {
                 ->and($phone->number)->toBe('+16054035754')
                 ->and($phone->buttonText)->toBe('+1 605 403 5754');
         });
-        
+
         it('gets the Puerto Vallarta English FADS phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -181,7 +181,7 @@ describe('GBPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Gads phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -196,9 +196,9 @@ describe('GBPV Phone Directory', function () {
         });
     });
 
-    describe('Spanish', function() {
+    describe('Spanish', function () {
         it('gets the Puerto Vallarta Spanish desktop phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -213,7 +213,7 @@ describe('GBPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta Spanish Mobile phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -232,7 +232,7 @@ describe('GBPV Phone Directory', function () {
 describe('GBLC Phone Directory', function () {
     describe('English', function () {
         it('gets the Los Cabos English desktop phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cabo,
@@ -247,7 +247,7 @@ describe('GBLC Phone Directory', function () {
         });
 
         it('gets the Los Cabos English Mobile phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cabo,
@@ -262,7 +262,7 @@ describe('GBLC Phone Directory', function () {
         });
 
         it('gets the Los Cabos English Email campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cabo,
@@ -277,7 +277,7 @@ describe('GBLC Phone Directory', function () {
         });
 
         it('gets the Los Cabos English Fads campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cabo,
@@ -291,8 +291,8 @@ describe('GBLC Phone Directory', function () {
                 ->and($phone->buttonText)->toBe('+1 602 671 6747');
         });
 
-         it('gets the Los Cabos English Gads campaign phone number for Garza Blanca', function () {
-            $directory = new GarzaBlancaPhoneDirectory();
+        it('gets the Los Cabos English Gads campaign phone number for Garza Blanca', function () {
+            $directory = new GarzaBlancaPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cabo,

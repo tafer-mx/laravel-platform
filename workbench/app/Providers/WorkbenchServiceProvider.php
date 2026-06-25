@@ -11,7 +11,9 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        config([
+            'tafer.brand.slug' => env('TAFER_BRAND_SLUG', 'villa-palmar-cancun'),
+        ]);
     }
 
     /**
@@ -23,6 +25,6 @@ class WorkbenchServiceProvider extends ServiceProvider
         ? \workbench_path('resources/views')
         : base_path('workbench/resources/views');
 
-         $this->loadViewsFrom($path, 'workbench');
+        $this->loadViewsFrom($path, 'workbench');
     }
 }

@@ -12,7 +12,9 @@ return Application::configure(basePath: $APP_BASE_PATH ?? default_skeleton_path(
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->validateCsrfTokens(except: [
+            'storyblok/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

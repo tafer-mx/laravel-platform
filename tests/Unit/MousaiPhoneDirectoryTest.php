@@ -8,9 +8,9 @@ use TAFER\Core\Phones\MousaiPhoneDirectory;
 use TAFER\Core\Records\PhoneNumber;
 
 describe('MSCN Phone Directory', function () {
-    describe('English', function(){
+    describe('English', function () {
         it('gets the Cancun English desktop phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -25,7 +25,7 @@ describe('MSCN Phone Directory', function () {
         });
 
         it('gets the Cancun English mobile phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -40,7 +40,7 @@ describe('MSCN Phone Directory', function () {
         });
 
         it('gets the Cancun English email campaign phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -55,7 +55,7 @@ describe('MSCN Phone Directory', function () {
         });
 
         it('gets the Cancun English FADS campaign phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -70,7 +70,7 @@ describe('MSCN Phone Directory', function () {
         });
 
         it('gets the Cancun English GADS campaign phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -83,11 +83,11 @@ describe('MSCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+17864493994')
                 ->and($phone->buttonText)->toBe('+1 786 449 3994');
         });
-   });
+    });
 
-   describe('Spanish', function () {
+    describe('Spanish', function () {
         it('gets the Cancun Spanish desktop phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -102,7 +102,7 @@ describe('MSCN Phone Directory', function () {
         });
 
         it('gets the Cancun Spanish mobile phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::Cancun,
@@ -115,13 +115,13 @@ describe('MSCN Phone Directory', function () {
                 ->and($phone->number)->toBe('+528006490663')
                 ->and($phone->buttonText)->toBe('+52 800 649 0663');
         });
-   });
+    });
 });
 
 describe('MSPV Phone Directory', function () {
     describe('English', function () {
         it('gets the Puerto Vallarta English desktop phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -136,7 +136,7 @@ describe('MSPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Mobile phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -151,7 +151,7 @@ describe('MSPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Email phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -164,9 +164,9 @@ describe('MSPV Phone Directory', function () {
                 ->and($phone->number)->toBe('+16056100618')
                 ->and($phone->buttonText)->toBe('+1 605 610 0618');
         });
-        
+
         it('gets the Puerto Vallarta English FADS phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -181,7 +181,7 @@ describe('MSPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta English Gads phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -196,9 +196,9 @@ describe('MSPV Phone Directory', function () {
         });
     });
 
-    describe('Spanish', function() {
+    describe('Spanish', function () {
         it('gets the Puerto Vallarta Spanish desktop phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,
@@ -213,7 +213,7 @@ describe('MSPV Phone Directory', function () {
         });
 
         it('gets the Puerto Vallarta Spanish Mobile phone number for Mousai', function () {
-            $directory = new MousaiPhoneDirectory();
+            $directory = new MousaiPhoneDirectory;
 
             $phone = $directory->get(
                 location: Location::PuertoVallarta,

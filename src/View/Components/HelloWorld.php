@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace TAFER\Core\View\Components;
 
@@ -9,6 +9,7 @@ use TAFER\Core\Enums\Resort;
 class HelloWorld extends Component
 {
     public Resort $resort;
+
     /**
      * Create a new component instance.
      */

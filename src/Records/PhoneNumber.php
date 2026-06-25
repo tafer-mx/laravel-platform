@@ -21,16 +21,16 @@ readonly class PhoneNumber
     /**
      * Create a new phone number record.
      *
-     * @param string $number Raw phone number used for the `tel:` URL.
-     *                       Example: +18009843015
-     * @param string $buttonText Human-readable phone number.
-     *                           Example: +1 800 984 3015
+     * @param  string  $number  Raw phone number used for the `tel:` URL.
+     *                          Example: +18009843015
+     * @param  string  $buttonText  Human-readable phone number.
+     *                              Example: +1 800 984 3015
      */
     public function __construct(
         public string $number,
         public string $buttonText,
     ) {
-        $this->url = 'tel:' . $this->number;
+        $this->url = 'tel:'.$this->number;
     }
 
     /**

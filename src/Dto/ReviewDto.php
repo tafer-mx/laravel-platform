@@ -2,12 +2,10 @@
 
 namespace TAFER\Core\Dto;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use TAFER\Core\Enums\Locale;
-use TAFER\Core\Enums\Resort;
-use TAFER\Core\Records\ResortRegion;
 use TAFER\Core\Enums\Location;
+use TAFER\Core\Enums\Resort;
 
 /**
  * Data transfer object representing a single review returned by the reviews API.
@@ -17,22 +15,22 @@ use TAFER\Core\Enums\Location;
 final readonly class ReviewDto
 {
     /**
-     * @param int $id Internal review identifier.
-     * @param string|null $externalId External review identifier from the provider.
-     * @param string|null $title Review title.
-     * @param string $excerpt Review content or excerpt.
-     * @param int $rating Review rating value.
-     * @param CarbonImmutable $publishedAt Date when the review was published.
-     * @param string|null $userName Name of the review author.
-     * @param string|null $avatarUrl URL of the review author's avatar.
-     * @param Resort $brand Resort brand resolved from the region code.
-     * @param string $code Region code resolved from the brand and destination.
-     * @param Locale $language Review language.
-     * @param Location $destination Review destination/location.
-     * @param CarbonImmutable $createdAt Date when the review record was created.
-     * @param CarbonImmutable $updatedAt Date when the review record was last updated.
-     * @param string $provider Review provider name.
-     * @param int $visibility Review visibility flag.
+     * @param  int  $id  Internal review identifier.
+     * @param  string|null  $externalId  External review identifier from the provider.
+     * @param  string|null  $title  Review title.
+     * @param  string  $excerpt  Review content or excerpt.
+     * @param  int  $rating  Review rating value.
+     * @param  CarbonImmutable  $publishedAt  Date when the review was published.
+     * @param  string|null  $userName  Name of the review author.
+     * @param  string|null  $avatarUrl  URL of the review author's avatar.
+     * @param  Resort  $brand  Resort brand resolved from the region code.
+     * @param  string  $code  Region code resolved from the brand and destination.
+     * @param  Locale  $language  Review language.
+     * @param  Location  $destination  Review destination/location.
+     * @param  CarbonImmutable  $createdAt  Date when the review record was created.
+     * @param  CarbonImmutable  $updatedAt  Date when the review record was last updated.
+     * @param  string  $provider  Review provider name.
+     * @param  int  $visibility  Review visibility flag.
      */
     private function __construct(
         public int $id,
@@ -80,39 +78,36 @@ final readonly class ReviewDto
      * } $data Raw review payload.
      *
      * @throws \InvalidArgumentException When the brand, destination, or region code cannot be resolved.
-     *
-     * @return self
      */
-   public static function fromArray(array $data): self
+    public static function fromArray(array $data): self
     {
-        $brand = !empty($data['code'])
+        $brand = ! empty($data['code'])
             ? Resort::resortByRegionCode($data['code'])
             : null;
-        if (!$brand) {
+        if (! $brand) {
             throw new \InvalidArgumentException(
                 "Invalid or missing brand value: {$data['brand']}"
             );
         }
-    
 
-        $location = !empty($data['destination'])
+        $location = ! empty($data['destination'])
             ? Location::fromCode($data['destination'])
             : null;
 
-        if (!$location) {
+        if (! $location) {
             throw new \InvalidArgumentException(
                 "Invalid or missing destination value: {$data['destination']}"
             );
         }
 
         $destination = $brand->regionCode($location);
-        if(!$destination) {
+        if (! $destination) {
             throw new \InvalidArgumentException(
                 "Invalid or missing destination value: {$data['destination']}"
             );
         }
 
-        $lang = !empty($data['language'])
+        $lang = ! empty($data['language'])
             ? Locale::tryFrom($data['language'])
             : Locale::English;
 
@@ -121,7 +116,7 @@ final readonly class ReviewDto
             externalId: $data['external_id'] ?? null,
             title: $data['title'] ?? null,
             excerpt: $data['excerpt'],
-            rating: (int)$data['rating'],
+            rating: (int) $data['rating'],
             publishedAt: CarbonImmutable::parse($data['published_at']),
             userName: $data['user_name'] ?? null,
             avatarUrl: $data['avatar_url'] ?? null,

@@ -16,4 +16,19 @@ enum Device: string
      * Mobile visitors.
      */
     case Mobile = 'mobile';
+
+    /**
+     * Tablet visitors.
+     */
+    case Tablet = 'tablet';
+
+    public function isMobile(): bool
+    {
+        return $this === self::Mobile || $this === self::Tablet;
+    }
+
+    public function isDesktop(): bool
+    {
+        return $this === self::Desktop;
+    }
 }

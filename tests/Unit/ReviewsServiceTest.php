@@ -18,8 +18,8 @@ use TAFER\Core\Enums\Resort;
 use TAFER\Core\Services\ReviewsService;
 
 /**
- * @param array<int, mixed> $queue
- * @param array<int, array{request: RequestInterface, response?: ResponseInterface, error?: mixed}> $history
+ * @param  array<int, mixed>  $queue
+ * @param  array<int, array{request: RequestInterface, response?: ResponseInterface, error?: mixed}>  $history
  */
 function makeReviewsServiceWithMock(array $queue, array &$history = []): ReviewsService
 {
@@ -167,7 +167,7 @@ it('returns only visible five star reviews by brand', function () {
     $request = $history[0]['request'];
 
     expect($request->getMethod())->toBe('GET');
-    expect($request->getUri()->getPath())->toBe('/brand/' . Resort::GarzaBlanca->code());
+    expect($request->getUri()->getPath())->toBe('/brand/'.Resort::GarzaBlanca->code());
     expect($request->getUri()->getQuery())->toBe('language=en');
     expect($request->getHeaderLine('Accept-Language'))->toBe('en');
 });
@@ -246,9 +246,9 @@ it('returns an empty collection when the reviews api request fails', function ()
         ->toBeEmpty();
 });
 
-it('Must return an empty collection when data is unset', function ()  {
+it('Must return an empty collection when data is unset', function () {
     $payload = [
-        "success" => true,
+        'success' => true,
     ];
 
     $service = makeReviewsServiceWithMock([
@@ -259,7 +259,6 @@ it('Must return an empty collection when data is unset', function ()  {
 
     $reviews = $service->getByHotel($hotelRegion, Locale::English);
 
-    dump($reviews);
     expect($reviews)
         ->toBeInstanceOf(Collection::class)
         ->toBeEmpty();
