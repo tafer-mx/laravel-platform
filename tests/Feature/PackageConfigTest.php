@@ -6,8 +6,13 @@ use Storyblok\Api\StoryblokClientInterface;
 use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Services\ReviewsService;
+use TAFER\Core\TAFERServiceProvider;
 
 uses(TestCase::class);
+
+beforeEach(function () {
+    $this->app->register(TAFERServiceProvider::class);
+});
 
 it('requires a brand slug to resolve the request context', function () {
     config(['tafer.brand.slug' => '']);
@@ -20,6 +25,25 @@ it('requires a Storyblok token to resolve the Storyblok client', function () {
 
     app(StoryblokClientInterface::class);
 })->throws(InvalidArgumentException::class, 'Missing required config value [tafer.storyblok.token].');
+
+it('configures the Storyblok client URL token and timeout from config', function () {
+    config([
+        'tafer.storyblok.base_uri' => 'https://api.storyblok.test',
+        'tafer.storyblok.token' => 'public-token',
+        'tafer.storyblok.timeout' => 9,
+    ]);
+
+    $client = app(StoryblokClientInterface::class);
+
+    $token = new ReflectionProperty($client, 'token');
+    $httpClient = (new ReflectionProperty($client, 'client'))->getValue($client);
+    $defaultOptions = (new ReflectionProperty($httpClient, 'defaultOptionsByRegexp'))->getValue($httpClient);
+
+    expect($token->getValue($client))->toBe('public-token')
+        ->and($defaultOptions)->toHaveKey('https\://api\.storyblok\.test/')
+        ->and($defaultOptions['https\://api\.storyblok\.test/']['base_uri'])->toBe('https://api.storyblok.test')
+        ->and($defaultOptions['https\://api\.storyblok\.test/']['timeout'])->toBe(9);
+});
 
 it('requires a middleware base URL to resolve the reviews client', function () {
     config(['tafer.middleware.base_url' => '']);
