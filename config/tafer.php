@@ -6,7 +6,7 @@ return [
     ],
 
     'middleware' => [
-        'base_url' => null,
+        'base_url' => 'https://middleware.taferresorts.com/',
         'reviews' => [
             'timeout' => 4,
         ],

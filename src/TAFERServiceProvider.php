@@ -5,6 +5,7 @@ namespace TAFER\Core;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Resolver\LinkType;
 use Storyblok\Api\StoriesApi;
@@ -39,19 +40,19 @@ class TAFERServiceProvider extends ServiceProvider
         }
 
         $this->app->scoped(RequestCtx::class, fn () => new RequestCtx(
-            config('tafer.brand.slug', ''),
+            $this->requiredConfig('tafer.brand.slug'),
         ));
 
         $this->app->singleton(ReviewClient::class, fn () => new ReviewsService(
             new Client([
-                'base_uri' => config('tafer.middleware.base_url'),
+                'base_uri' => $this->requiredConfig('tafer.middleware.base_url'),
                 'timeout' => config('tafer.middleware.reviews.timeout'),
             ])
         ));
 
         $this->app->singleton(StoryblokClientInterface::class, fn () => new StoryblokClient(
             config('tafer.storyblok.base_uri', 'https://api.storyblok.com'),
-            config('tafer.storyblok.token', ''),
+            $this->requiredConfig('tafer.storyblok.token'),
             config('tafer.storyblok.timeout', 4),
         ));
 
@@ -142,5 +143,16 @@ class TAFERServiceProvider extends ServiceProvider
         // https://laravel.com/docs/13.x/packages#view-components
         Blade::component('tafer-phone-directory', PhoneDirectory::class);
 
+    }
+
+    private function requiredConfig(string $key): string
+    {
+        $value = config($key);
+
+        if (! is_string($value) || trim($value) === '') {
+            throw new InvalidArgumentException("Missing required config value [{$key}].");
+        }
+
+        return trim($value);
     }
 }

@@ -122,6 +122,10 @@ Valores principales que cada app host debe sobrescribir en `config/tafer.php`:
     'slug' => 'mousai',
 ],
 
+'middleware' => [
+    'base_url' => 'https://middleware.taferresorts.com/',
+],
+
 'storyblok' => [
     'token' => env('STORYBLOK_TOKEN'),
     'default_locale' => 'en',
@@ -137,6 +141,12 @@ Valores principales que cada app host debe sobrescribir en `config/tafer.php`:
     ],
 ],
 ```
+
+Valores requeridos:
+
+- `tafer.brand.slug`: necesario para construir rutas internas de Storyblok.
+- `tafer.middleware.base_url`: necesario para construir el cliente de reviews.
+- `tafer.storyblok.token`: necesario para construir el cliente de Storyblok.
 
 Un TTL igual a `0` significa `forever`, reproduciendo el comportamiento actual. Cada app
 debe usar un namespace diferente si comparte el mismo cache store con otros sitios o

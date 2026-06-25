@@ -112,6 +112,10 @@ return [
         'slug' => 'villa-palmar-cancun',
     ],
 
+    'middleware' => [
+        'base_url' => 'https://middleware.taferresorts.com/',
+    ],
+
     'storyblok' => [
         'token' => env('STORYBLOK_TOKEN'),
         'version' => 'published',
@@ -133,6 +137,13 @@ return [
 The package config ships with the common non-sensitive defaults used by TAFER
 apps. Each app should override its brand/cache namespace and decide whether its
 published config uses fixed values or reads from that app's `.env`.
+
+Required values fail early with a clear exception when their dependent service is
+resolved:
+
+- `tafer.brand.slug`, required by `RequestCtx`.
+- `tafer.middleware.base_url`, required by the reviews middleware client.
+- `tafer.storyblok.token`, required by the Storyblok API client.
 
 Set `STORYBLOK_CACHE_ENABLED=false` to use the raw `StoryblokService` without
 the cache decorator if your app config maps that value from `.env`; otherwise set
