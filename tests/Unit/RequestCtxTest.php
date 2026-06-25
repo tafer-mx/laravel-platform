@@ -19,7 +19,7 @@ it('rejects invalid brand slugs', function () {
 })->throws(InvalidArgumentException::class, 'Invalid resort slug: unknown-resort');
 
 it('sets request context values fluently', function () {
-    $requestCtx = new RequestCtx('garza-blanca')
+    $requestCtx = (new RequestCtx('garza-blanca'))
         ->setLocale(Locale::Spanish)
         ->setLocation(Location::Cancun)
         ->setSlug('special-offers-and-packages')
