@@ -76,16 +76,29 @@ jobs:
       - name: Configure Composer auth
         run: composer config --global github-oauth.github.com "${{ secrets.TAFER_PACKAGES_TOKEN }}"
 
+      - name: Check package is already installed
+        id: package
+        run: |
+          if composer show --locked tafer-mx/laravel-platform > /dev/null 2>&1; then
+            echo "installed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::tafer-mx/laravel-platform is not installed in this project. Skipping update."
+            echo "installed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update package
+        if: steps.package.outputs.installed == 'true'
         run: composer update tafer-mx/laravel-platform --with-dependencies --no-interaction --no-progress
 
       - name: Run tests
+        if: steps.package.outputs.installed == 'true'
         run: composer test
 
       - name: Create Pull Request
+        if: steps.package.outputs.installed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: chore/update-tafer-platform-${{ github.event.client_payload.version }}
+          branch: chore/update-tafer-platform
           title: "chore: update TAFER platform to ${{ github.event.client_payload.version }}"
           commit-message: "chore: update TAFER platform to ${{ github.event.client_payload.version }}"
           body: |
@@ -93,6 +106,20 @@ jobs:
 
             Version: `${{ github.event.client_payload.version }}`
 ```
+
+Este template no instala el paquete si la app todavía no lo consume. Si
+`tafer-mx/laravel-platform` no existe en `composer.lock`, el workflow termina sin
+abrir PR.
+
+La branch del PR es fija:
+
+```txt
+chore/update-tafer-platform
+```
+
+Si se publica `v0.3.1` y luego `v0.3.2` antes de mergear el PR anterior, el
+siguiente workflow reutiliza la misma branch/PR y lo actualiza hacia la versión
+más reciente compatible con el constraint de Composer.
 
 ## Composer auth en apps privadas
 
