@@ -13,6 +13,7 @@ use Storyblok\Api\StoriesApiInterface;
 use Storyblok\Api\StoryblokClient;
 use Storyblok\Api\StoryblokClientInterface;
 use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Context\RequestCtxRelation;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Contracts\StoryblokCache;
 use TAFER\Core\Contracts\StoryblokCacheInvalidator;
@@ -20,7 +21,9 @@ use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Services\CachedStoryblokService;
 use TAFER\Core\Services\ReviewsService;
+use TAFER\Core\Services\StoryblokContextResolver;
 use TAFER\Core\Services\StoryblokService;
+use TAFER\Core\Services\StoryblokVariableResolver;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
@@ -129,6 +132,25 @@ class TAFERServiceProvider extends ServiceProvider
             cache: $this->app->make(StoryblokCacheInvalidator::class),
             cacheNamespace: config('tafer.storyblok.cache.namespace', 'default'),
         ));
+
+        // ========================================
+        // Context Relations System
+        // ========================================
+
+        // Stack de contextos de Storyblok (scoped = se resetea por request)
+        $this->app->scoped(RequestCtxRelation::class);
+
+        // Resolver de contextos que usa el stack
+        $this->app->scoped(
+            StoryblokContextResolver::class,
+            fn ($app) => new StoryblokContextResolver(
+                $app->make(StoryblokGateway::class),
+                $app->make(RequestCtxRelation::class),
+            )
+        );
+
+        // Resolver de variables (singleton = stateless, no necesita resetearse)
+        $this->app->singleton(StoryblokVariableResolver::class);
     }
 
     public function boot(): void
