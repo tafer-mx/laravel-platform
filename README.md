@@ -121,6 +121,11 @@ return [
         'version' => 'published',
         'default_locale' => 'en',
         'resolve_links' => 'url',
+        'global_config' => [
+            // Set false for resorts such as Villa Palmar whose configuration
+            // always lives at brands/{resort}/config_brand.
+            'location_scoped' => false,
+        ],
 
         'cache' => [
             'enabled' => true,
@@ -236,11 +241,35 @@ use TAFER\Core\Middlewares\SetCacheHeaders;
 The package also exposes:
 
 - `TAFER\Core\Services\BreadcrumbService`
+- `TAFER\Core\Services\RecaptchaService`
+- `TAFER\Core\Services\HubSpotMiddlewareService`
 - `TAFER\Core\Storyblok\StoryblokComponentHelper`
 - `TAFER\Core\Storyblok\StoryblokLinkResolver`
 - `TAFER\Core\Storyblok\StoryblokRichTextHelper`
 - `TAFER\Core\Storyblok\InlineHtmlSanitizer`
+- `TAFER\Core\Storyblok\LoadsGlobalConfig`
 - `TAFER\Core\Support\ConditionalOfferHelper`
+
+Consumer Storyblok adapters can expose global configuration without a separate
+service class:
+
+```php
+use TAFER\Core\Storyblok\LoadsGlobalConfig;
+
+class StoryblokService
+{
+    use LoadsGlobalConfig;
+
+    // Existing getStory(...) implementation.
+}
+
+$globalConfig = $storyblokService->getGlobalConfig($requestCtx, $requestCtx->isPreview);
+```
+
+`RecaptchaService` continues reading `services.recaptcha.secret` and
+`HubSpotMiddlewareService` continues reading
+`services.middleware.hubspot_endpoint` and `services.middleware.mail_token`, so
+existing host configuration remains compatible.
 
 Legacy Blade calls such as `storyblokImage()`, `resolve_link()`,
 `cleanStoryblokText()`, `getSvgContent()`, `customFilterImage()`,
