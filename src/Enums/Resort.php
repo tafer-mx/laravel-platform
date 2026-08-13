@@ -61,6 +61,7 @@ enum Resort: string
 
             self::VillaPalmarCancun => [
                 new ResortRegion(Location::Cancun, 'VPCN'),
+                new ResortRegion(Location::Corp, 'VPCN'),
             ],
 
             self::Sanctuary => [

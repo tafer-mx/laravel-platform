@@ -19,6 +19,9 @@ return [
         'version' => 'published',
         'default_locale' => 'en',
         'resolve_links' => 'url',
+        'global_config' => [
+            'location_scoped' => true,
+        ],
         'resolve_relations' => [
             'Basic_reference.reference',
             'Basic_Reference_Articles.reference',
