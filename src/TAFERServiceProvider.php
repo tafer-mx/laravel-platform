@@ -27,6 +27,7 @@ use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
 use TAFER\Core\View\Components\PhoneDirectory;
+use TAFER\Core\View\Components\StoryblokResolver;
 
 class TAFERServiceProvider extends ServiceProvider
 {
@@ -142,6 +143,7 @@ class TAFERServiceProvider extends ServiceProvider
         // Class Components
         // https://laravel.com/docs/13.x/packages#view-components
         Blade::component('tafer-phone-directory', PhoneDirectory::class);
+        Blade::component('storyblok._resolver', StoryblokResolver::class);
 
     }
 

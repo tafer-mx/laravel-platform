@@ -240,6 +240,7 @@ use TAFER\Core\Middlewares\SetCacheHeaders;
 
 The package also exposes:
 
+- `TAFER\Core\Http\Controllers\DownloadController`
 - `TAFER\Core\Services\BreadcrumbService`
 - `TAFER\Core\Services\RecaptchaService`
 - `TAFER\Core\Services\HubSpotMiddlewareService`
@@ -249,6 +250,23 @@ The package also exposes:
 - `TAFER\Core\Storyblok\InlineHtmlSanitizer`
 - `TAFER\Core\Storyblok\LoadsGlobalConfig`
 - `TAFER\Core\Support\ConditionalOfferHelper`
+- `TAFER\Core\View\Components\StoryblokResolver`, registered as
+  `<x-storyblok._resolver>`
+
+Host apps can register the shared legacy download controller directly while
+keeping their existing route name:
+
+```php
+use Illuminate\Support\Facades\Route;
+use TAFER\Core\Http\Controllers\DownloadController;
+
+Route::get('/download/pdf', DownloadController::class)->name('download.pdf');
+```
+
+The downloader is intentionally centralized with its existing behavior in this
+release. Its source contains security TODOs for arbitrary URL/stream access,
+SSRF, redirects, timeouts, size limits, memory use, and exception disclosure.
+Those controls must be implemented before treating it as a hardened proxy.
 
 Consumer Storyblok adapters can expose global configuration without a separate
 service class:
