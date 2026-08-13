@@ -14,6 +14,7 @@ it('gets resort region codes', function () {
     expect(Resort::GarzaBlanca->regionCode(Location::Cancun))->toBe('GBCN')
         ->and(Resort::GarzaBlanca->regionCode(Location::PuertoVallarta))->toBe('GBPV')
         ->and(Resort::Sanctuary->regionCode(Location::PuertoVallarta))->toBe('SNCTRY')
+        ->and(Resort::VillaPalmarCancun->regionCode(Location::Corp))->toBe('VPCN')
         ->and(Resort::VillaPalmarCancun->regionCode(Location::Cabo))->toBeNull();
 });
 

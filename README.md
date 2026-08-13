@@ -221,6 +221,37 @@ POST http://localhost:6969/storyblok/webhook
 
 ---
 
+## Shared consumer logic
+
+Version 0.4 centralizes the common implementation used by the TAFER Laravel
+applications. Consumer projects should register these middleware explicitly in
+their web middleware stack:
+
+```php
+use TAFER\Core\Middlewares\RedirectLegacyHomePrefix;
+use TAFER\Core\Middlewares\ResolveRequestCtx;
+use TAFER\Core\Middlewares\SetCacheHeaders;
+```
+
+The package also exposes:
+
+- `TAFER\Core\Services\BreadcrumbService`
+- `TAFER\Core\Storyblok\StoryblokComponentHelper`
+- `TAFER\Core\Storyblok\StoryblokLinkResolver`
+- `TAFER\Core\Storyblok\StoryblokRichTextHelper`
+- `TAFER\Core\Storyblok\InlineHtmlSanitizer`
+- `TAFER\Core\Support\ConditionalOfferHelper`
+
+Legacy Blade calls such as `storyblokImage()`, `resolve_link()`,
+`cleanStoryblokText()`, `getSvgContent()`, `customFilterImage()`,
+`generateResponsiveSrcset()`, and `getImageDimensions()` are autoloaded by
+the package. Their behavior follows the Villa Palmar implementation.
+
+The migrated classes contain TODO markers because this release intentionally
+centralizes the existing behavior before redesigning those APIs.
+
+---
+
 ## Workflow & Releases
 
 ### Branch Strategy
