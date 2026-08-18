@@ -68,6 +68,12 @@ function countingStoryblokGateway(StoryResponse $response): StoryblokGateway
 
             return $this->response;
         }
+
+        public function resolveRelation(mixed $relation, bool $draft = false, string $lang = 'en'): ?array
+        {
+            // Mock implementation for testing
+            return null;
+        }
     };
 }
 

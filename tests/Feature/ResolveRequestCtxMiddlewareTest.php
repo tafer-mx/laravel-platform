@@ -4,16 +4,20 @@ use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Context\RequestCtxRelation;
 use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
 use TAFER\Core\Middlewares\ResolveRequestCtx;
+use TAFER\Core\Services\StoryblokVariableResolver;
 
 uses(TestCase::class);
 
 it('resolves request context from request segments', function () {
     $requestCtx = new RequestCtx('garza-blanca');
-    $middleware = new ResolveRequestCtx($requestCtx);
+    $ctxRelation = new RequestCtxRelation();
+    $variableResolver = new StoryblokVariableResolver();
+    $middleware = new ResolveRequestCtx($requestCtx, $ctxRelation, $variableResolver);
     $request = Request::create(
         '/es/puerto-vallarta/special-offers-and-packages/loyalty-sale',
         'GET',
@@ -38,13 +42,17 @@ it('resolves request context from request segments', function () {
 
 it('applies the resolved locale and shares the request context with views', function () {
     $requestCtx = new RequestCtx('mousai');
-    $middleware = new ResolveRequestCtx($requestCtx);
+    $ctxRelation = new RequestCtxRelation();
+    $variableResolver = new StoryblokVariableResolver();
+    $middleware = new ResolveRequestCtx($requestCtx, $ctxRelation, $variableResolver);
     $request = Request::create('/cancun/gallery');
 
     $middleware->handle($request, fn () => new Response('ok'));
 
     expect(app()->getLocale())->toBe('en')
         ->and(view()->shared('requestCtx'))->toBe($requestCtx)
+        ->and(view()->shared('ctxRelation'))->toBe($ctxRelation)
+        ->and(view()->shared('variableResolver'))->toBe($variableResolver)
         ->and($requestCtx->slug)->toBe('cancun/gallery')
         ->and($requestCtx->isPreview)->toBeFalse()
         ->and($requestCtx->locale)->toBe(Locale::English)
@@ -53,7 +61,9 @@ it('applies the resolved locale and shares the request context with views', func
 
 it('does not allow the same request context to be resolved twice', function () {
     $requestCtx = new RequestCtx('garza-blanca');
-    $middleware = new ResolveRequestCtx($requestCtx);
+    $ctxRelation = new RequestCtxRelation();
+    $variableResolver = new StoryblokVariableResolver();
+    $middleware = new ResolveRequestCtx($requestCtx, $ctxRelation, $variableResolver);
 
     $middleware->handle(
         Request::create('/puerto-vallarta/offers'),

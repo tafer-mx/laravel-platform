@@ -2,6 +2,8 @@
 
 namespace TAFER\Core\Services;
 
+use Illuminate\Support\Facades\Log;
+use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
@@ -26,5 +28,37 @@ class StoryblokService implements StoryblokGateway
         }
 
         return $this->storiesApi->byUuid($uuid, $request);
+    }
+
+    public function resolveRelation(mixed $relation, bool $draft = false, string $lang = 'en'): ?array
+    {
+        try {
+            // Extract UUID from relation
+            $uuid = is_string($relation) ? $relation : ($relation['uuid'] ?? null);
+
+            if ($uuid === null) {
+                return null;
+            }
+
+            // Build request with appropriate version and language
+            $request = new StoryRequest(
+                language: $lang,
+                version: $draft ? Version::Draft : Version::Published,
+            );
+
+            // Fetch the story
+            $response = $this->getStoryByUuid($uuid, $request);
+
+            return $response->story;
+        } catch (\Exception $e) {
+            Log::warning('Failed to resolve Storyblok relation', [
+                'relation' => $relation,
+                'draft' => $draft,
+                'lang' => $lang,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 }
