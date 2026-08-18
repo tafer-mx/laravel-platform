@@ -184,4 +184,10 @@ final readonly class CachedStoryblokService implements StoryblokGateway
 
         return implode('/', $segments);
     }
+
+    public function resolveRelation(mixed $relation, bool $draft = false, string $lang = 'en'): ?array
+    {
+        // Delegate to the origin service (which could be StoryblokService)
+        return $this->origin->resolveRelation($relation, $draft, $lang);
+    }
 }

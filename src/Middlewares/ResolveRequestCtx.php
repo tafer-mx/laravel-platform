@@ -6,12 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Context\RequestCtxRelation;
+use TAFER\Core\Services\StoryblokVariableResolver;
 use TAFER\Core\Support\RequestCtxSupport;
 
 class ResolveRequestCtx
 {
     public function __construct(
         private readonly RequestCtx $requestCtx,
+        private readonly RequestCtxRelation $ctxRelation,
+        private readonly StoryblokVariableResolver $variableResolver,
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -28,6 +32,8 @@ class ResolveRequestCtx
 
         app()->setLocale($this->requestCtx->locale->value);
         view()->share('requestCtx', $this->requestCtx);
+        view()->share('ctxRelation', $this->ctxRelation);
+        view()->share('variableResolver', $this->variableResolver);
 
         return $next($request);
     }
