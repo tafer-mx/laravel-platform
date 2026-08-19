@@ -3,9 +3,12 @@
 namespace TAFER\Core\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Context\RequestCtxRelation;
 use TAFER\Core\Context\StoryblokBlockContext;
+use Storyblok\Api\Request\StoryRequest;
+use Storyblok\Api\Domain\Value\Dto\Version;
 
 /**
  * Resolves and manages Storyblok context relations during component rendering.
@@ -109,7 +112,7 @@ class StoryblokContextResolver
             return $parent;
         }
 
-        $story = $this->storyblok->resolveRelation($relation, $draft, $lang);
+        $story = $this->resolveContextRelation($relation, $draft, $lang);
 
         if ($story === null) {
             Log::warning('Unable to resolve Storyblok context_relation', [
@@ -121,6 +124,42 @@ class StoryblokContextResolver
         }
 
         return $parent->withResolvedStory($story);
+    }
+
+    private function resolveContextRelation(
+        mixed $relation,
+        bool $draft = false,
+        string $lang = 'en',
+    ): ?array {
+        if (is_array($relation) && isset($relation['content'])) {
+            return $relation;
+        }
+
+        $uuid = is_string($relation) ? $relation : ($relation['uuid'] ?? null);
+
+        if ($uuid === null || ! Str::isUuid($uuid)) {
+            return null;
+        }
+
+        try {
+            $request = new StoryRequest(
+                language: $lang,
+                version: $draft ? Version::Draft : Version::Published,
+            );
+
+            $response = $this->storyblok->getStoryByUuid($uuid, $request);
+
+            return $response->story;
+        } catch (\Throwable $e) {
+            Log::warning('Failed to resolve Storyblok context relation', [
+                'relation' => $relation,
+                'draft' => $draft,
+                'lang' => $lang,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /**
