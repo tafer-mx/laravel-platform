@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\View as ViewContract;
+use TAFER\Core\Services\StoryblokContextResolver;
 
-// TODO: This implementation was moved as-is from the consumer projects and should be refactored into a more optimal design.
 class StoryblokResolver extends Component
 {
     /**
@@ -27,6 +27,11 @@ class StoryblokResolver extends Component
             'components.',
         ],
         public mixed $globalConfig = null,
+        public bool $tafer_rewards_mode = false,
+        public bool $footer_mode = false,
+        public bool $preserve_original_colors = false,
+        public bool $footer_logo = false,
+        public bool $mobile_full_width = false,
     ) {}
 
     /**
@@ -61,6 +66,50 @@ class StoryblokResolver extends Component
         }
 
         return null;
+    }
+
+    /**
+     * Resolve and enter the context created by this block.
+     *
+     * Returns true only when the block created its own context.
+     *
+     * @param  array<string, mixed>  $blok
+     */
+    public function enterContext(
+        array $blok,
+        bool $draft = false,
+        string $lang = 'en',
+    ): bool {
+        $contextResolver = app(StoryblokContextResolver::class);
+
+        $parentContext = $contextResolver->current();
+
+        $currentContext = $contextResolver->resolveFromBlok(
+            $blok,
+            $parentContext,
+            $draft,
+            $lang,
+        );
+
+        $createdContext = $currentContext !== $parentContext;
+
+        if ($createdContext) {
+            $contextResolver->enter($currentContext);
+        }
+
+        return $createdContext;
+    }
+
+    /**
+     * Remove only the context created by the current block.
+     */
+    public function leaveContext(bool $createdContext): void
+    {
+        if (! $createdContext) {
+            return;
+        }
+
+        app(StoryblokContextResolver::class)->leave();
     }
 
     /**

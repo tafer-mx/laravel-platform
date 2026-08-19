@@ -15,7 +15,7 @@ class StoryblokVariableResolver
     /**
      * Separadores que deben eliminarse si quedan huérfanos
      */
-    private const ORPHAN_SEPARATORS = ['-', '–', '—', '|', '/'];
+    private const ORPHAN_SEPARATORS = ['-', '–', '—', '|'];
 
     /**
      * Resuelve variables en un texto usando el contexto de Storyblok
