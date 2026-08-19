@@ -27,11 +27,11 @@ class StoryblokResolver extends Component
             'components.',
         ],
         public mixed $globalConfig = null,
-        public bool $tafer_rewards_mode = false,
-        public bool $footer_mode = false,
-        public bool $preserve_original_colors = false,
-        public bool $footer_logo = false,
-        public bool $mobile_full_width = false,
+        public mixed $tafer_rewards_mode = false,
+        public mixed $footer_mode = false,
+        public mixed $preserve_original_colors = false,
+        public mixed $footer_logo = false,
+        public mixed $mobile_full_width = false,
     ) {}
 
     /**
