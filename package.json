@@ -5,7 +5,8 @@
     "description": "Shared browser-side logic for TAFER Laravel applications",
     "type": "module",
     "exports": {
-        "./rates": "./resources/js/rates/index.js"
+        "./rates": "./resources/js/rates/index.js",
+        "./rates/alpine": "./resources/js/rates/alpine.js"
     },
     "files": [
         "resources/js"
