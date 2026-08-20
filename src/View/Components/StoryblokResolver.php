@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\View as ViewContract;
+use TAFER\Core\Context\RequestCtx;
+use TAFER\Core\Services\StoryblokContextResolver;
 
-// TODO: This implementation was moved as-is from the consumer projects and should be refactored into a more optimal design.
 class StoryblokResolver extends Component
 {
     /**
@@ -16,6 +17,7 @@ class StoryblokResolver extends Component
      */
     public function __construct(
         public array $bloks = [],
+
         public array $paths = [
             'components.storyblok.basic.',
             'components.storyblok.elements.',
@@ -26,7 +28,13 @@ class StoryblokResolver extends Component
             'components.storyblok.',
             'components.',
         ],
+
         public mixed $globalConfig = null,
+        public mixed $tafer_rewards_mode = false,
+        public mixed $footer_mode = false,
+        public mixed $preserve_original_colors = false,
+        public mixed $footer_logo = false,
+        public mixed $mobile_full_width = false,
     ) {}
 
     /**
@@ -61,6 +69,55 @@ class StoryblokResolver extends Component
         }
 
         return null;
+    }
+
+    /**
+     * Resolve and enter the context created by this block.
+     *
+     * Returns true only when the block created its own context.
+     *
+     * Blocks without context_relation inherit the current context
+     * and do not require Storyblok infrastructure to be resolved.
+     *
+     * @param  array<string, mixed>  $blok
+     */
+    public function enterContext(array $blok): bool
+    {
+        if (blank($blok['context_relation'] ?? null)) {
+            return false;
+        }
+
+        $contextResolver = app(StoryblokContextResolver::class);
+        $requestCtx = app(RequestCtx::class);
+
+        $parentContext = $contextResolver->current();
+
+        $currentContext = $contextResolver->resolveFromBlok(
+            $blok,
+            $parentContext,
+            $requestCtx->isPreview,
+            $requestCtx->locale->value,
+        );
+
+        $createdContext = $currentContext !== $parentContext;
+
+        if ($createdContext) {
+            $contextResolver->enter($currentContext);
+        }
+
+        return $createdContext;
+    }
+
+    /**
+     * Remove only the context created by the current block.
+     */
+    public function leaveContext(bool $createdContext): void
+    {
+        if (! $createdContext) {
+            return;
+        }
+
+        app(StoryblokContextResolver::class)->leave();
     }
 
     /**

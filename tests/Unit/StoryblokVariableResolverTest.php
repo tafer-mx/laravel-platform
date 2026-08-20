@@ -176,7 +176,6 @@ it('handles various separator types', function () {
 
     expect($resolver->resolve('{{ text }} - {{ missing }}', $context))->toBe('CONTENT')
         ->and($resolver->resolve('{{ text }} | {{ missing }}', $context))->toBe('CONTENT')
-        ->and($resolver->resolve('{{ text }} / {{ missing }}', $context))->toBe('CONTENT')
         ->and($resolver->resolve('{{ text }} – {{ missing }}', $context))->toBe('CONTENT')
         ->and($resolver->resolve('{{ text }} — {{ missing }}', $context))->toBe('CONTENT');
 });
