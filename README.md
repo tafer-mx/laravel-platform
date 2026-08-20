@@ -440,7 +440,7 @@ Add the release that matches the Composer package to the consumer's
 ```json
 {
   "dependencies": {
-    "@tafer-mx/laravel-platform": "github:tafer-mx/laravel-platform#v0.6.0"
+    "@tafer-mx/laravel-platform": "https://github.com/tafer-mx/laravel-platform/archive/refs/tags/v0.6.0.tar.gz"
   }
 }
 ```
