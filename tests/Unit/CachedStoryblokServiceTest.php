@@ -74,6 +74,11 @@ function countingStoryblokGateway(StoryResponse $response): StoryblokGateway
             // Mock implementation for testing
             return null;
         }
+        
+        public function getStoriesByContentType(string $contentType, array $filters = [], bool $draft = false, string $lang = 'en'): array
+        {
+            return [];
+        }
     };
 }
 
