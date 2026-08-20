@@ -1,0 +1,7 @@
+interface:
+  display_name: "Laravel Alpine Components"
+  short_description: "Enforce shared Alpine component factories."
+  default_prompt: "Create or refactor this Alpine component using the laravel-platform create{Name}Component() pattern."
+
+policy:
+  allow_implicit_invocation: true
