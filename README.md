@@ -430,28 +430,29 @@ composer require tafer-mx/laravel-platform
 
 ## JavaScript Package
 
-Browser-side modules are published from this repository as the private GitHub
-Package `@tafer-mx/laravel-platform`. PHP and JavaScript use the same release
-number.
+Browser-side modules are installed directly from this repository's public Git
+tags. No npm registry account, `.npmrc`, or package token is required. PHP and
+JavaScript use the same release tag.
 
-Add the GitHub Packages scope and environment-based authentication to the
-consumer project's `.npmrc`:
+Add the release that matches the Composer package to the consumer's
+`package.json`:
 
-```ini
-@tafer-mx:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```json
+{
+  "dependencies": {
+    "@tafer-mx/laravel-platform": "github:tafer-mx/laravel-platform#v0.6.0"
+  }
+}
 ```
 
-Install the release that matches the Composer package:
+Then update the lockfile:
 
 ```sh
-npm install @tafer-mx/laravel-platform@^0.6.0
+npm install
 ```
 
-Developers must provide a GitHub classic personal access token with
-`read:packages` as `NODE_AUTH_TOKEN`. GitHub Actions workflows can use their
-short-lived `GITHUB_TOKEN` after the consumer repository is granted read access
-to the package.
+Use an exact Git tag so installs remain reproducible. The repository must be
+public for anonymous installation.
 
 ### Rates
 
@@ -489,13 +490,13 @@ The Alpine component owns loading, manual-rate validation, API error handling,
 currency selection, and price formatting. Consumer Blade templates continue to
 provide `suiteId`, `campaignCode`, manual rates, and captions through `x-data`.
 
-## npm Release Flow
+## JavaScript Release Flow
 
 1. Keep `package.json` aligned with the next Composer tag.
 2. Merge the release into `main`.
-3. Publish the matching GitHub release, for example `v0.6.0`.
-4. The release workflow runs the PHP and JavaScript suites, verifies the npm
-   tarball, and publishes it to GitHub Packages.
+3. Run the PHP and JavaScript test suites and `npm run pack:check`.
+4. Create and push the matching Git tag, for example `v0.6.0`.
+5. Update consumers to that exact tag and regenerate their npm lockfiles.
 
-The release workflow rejects a tag that does not exactly match
-`v${package.json.version}`.
+The Git tag is the release artifact for both Composer and npm consumers; there
+is no separate npm publish step.
