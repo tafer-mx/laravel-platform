@@ -1,4 +1,6 @@
-@php($items = $items())
+@php
+    $items = $items();
+@endphp
 
 @if ($items === [])
     @include('components.storyblok._unknown')
@@ -14,14 +16,9 @@
              * Si no tiene context_relation, conservará el contexto
              * actual y devolverá false.
              */
-            $createdContext = $enterContext(
-                $blok,
-                $requestCtx->isPreview,
-                $requestCtx->locale->value,
-            );
+            $createdContext = $enterContext($blok);
 
-            try {
-                $dynamicComponentName = $resolveDynamicComponent($blok);
+            $dynamicComponentName = $resolveDynamicComponent($blok);
         @endphp
 
         @if ($dynamicComponentName !== null)
@@ -48,13 +45,7 @@
         @endif
 
         @php
-            } finally {
-                /*
-                 * Retirar exclusivamente el contexto creado
-                 * por este mismo blok.
-                 */
-                $leaveContext($createdContext);
-            }
+            $leaveContext($createdContext);
         @endphp
     @endforeach
 @endif
