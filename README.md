@@ -427,3 +427,76 @@ In the Laravel project's `composer.json`
 ```sh
 composer require tafer-mx/laravel-platform
 ```
+
+## JavaScript Package
+
+Browser-side modules are installed directly from this repository's public Git
+tags. No npm registry account, `.npmrc`, or package token is required. PHP and
+JavaScript use the same release tag.
+
+Add the release that matches the Composer package to the consumer's
+`package.json`:
+
+```json
+{
+  "dependencies": {
+    "@tafer-mx/laravel-platform": "https://github.com/tafer-mx/laravel-platform/archive/refs/tags/v0.6.0.tar.gz"
+  }
+}
+```
+
+Then update the lockfile:
+
+```sh
+npm install
+```
+
+Use an exact Git tag so installs remain reproducible. The repository must be
+public for anonymous installation.
+
+### Rates
+
+The core rates service is framework-neutral and configured by each consumer:
+
+```js
+import { createRateService } from '@tafer-mx/laravel-platform/rates';
+
+const rateService = createRateService({
+    baseUrl: import.meta.env.VITE_MIDDLEWARE_BASE_URL,
+});
+
+const plans = await rateService.getRatePlansBySuite(campaignCode, suiteId);
+```
+
+If `baseUrl` is omitted, the service uses
+`https://middleware.taferresorts.com`. The package does not read Vite environment
+variables directly.
+
+For Alpine applications, register the packaged component factory and inject the
+consumer's Vite configuration at the application entrypoint:
+
+```js
+import Alpine from 'alpinejs';
+import { createRatesComponent } from '@tafer-mx/laravel-platform/rates/alpine';
+
+const rates = createRatesComponent({
+    baseUrl: import.meta.env.VITE_MIDDLEWARE_BASE_URL || undefined,
+});
+
+Alpine.data('rates', rates);
+```
+
+The Alpine component owns loading, manual-rate validation, API error handling,
+currency selection, and price formatting. Consumer Blade templates continue to
+provide `suiteId`, `campaignCode`, manual rates, and captions through `x-data`.
+
+## JavaScript Release Flow
+
+1. Keep `package.json` aligned with the next Composer tag.
+2. Merge the release into `main`.
+3. Run the PHP and JavaScript test suites and `npm run pack:check`.
+4. Create and push the matching Git tag, for example `v0.6.0`.
+5. Update consumers to that exact tag and regenerate their npm lockfiles.
+
+The Git tag is the release artifact for both Composer and npm consumers; there
+is no separate npm publish step.
