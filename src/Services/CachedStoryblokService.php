@@ -190,4 +190,10 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         // Delegate to the origin service (which could be StoryblokService)
         return $this->origin->resolveRelation($relation, $draft, $lang);
     }
+    
+    public function getStoriesByContentType(string $contentType, array $filters = [], bool $draft = false, string $lang = 'en'): array {
+    
+        return $this->origin->getStoriesByContentType($contentType, $filters, $draft, $lang);
+
+    }
 }
