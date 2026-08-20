@@ -427,3 +427,57 @@ In the Laravel project's `composer.json`
 ```sh
 composer require tafer-mx/laravel-platform
 ```
+
+## JavaScript Package
+
+Browser-side modules are published from this repository as the private GitHub
+Package `@tafer-mx/laravel-platform`. PHP and JavaScript use the same release
+number.
+
+Add the GitHub Packages scope and environment-based authentication to the
+consumer project's `.npmrc`:
+
+```ini
+@tafer-mx:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+Install the release that matches the Composer package:
+
+```sh
+npm install @tafer-mx/laravel-platform@^0.6.0
+```
+
+Developers must provide a GitHub classic personal access token with
+`read:packages` as `NODE_AUTH_TOKEN`. GitHub Actions workflows can use their
+short-lived `GITHUB_TOKEN` after the consumer repository is granted read access
+to the package.
+
+### Rates
+
+The rates module is framework-neutral and configured by each consumer:
+
+```js
+import { createRateService } from '@tafer-mx/laravel-platform/rates';
+
+const rateService = createRateService({
+    baseUrl: import.meta.env.VITE_MIDDLEWARE_BASE_URL,
+});
+
+const plans = await rateService.getRatePlansBySuite(campaignCode, suiteId);
+```
+
+If `baseUrl` is omitted, the service uses
+`https://middleware.taferresorts.com`. The package does not read Vite environment
+variables directly.
+
+## npm Release Flow
+
+1. Keep `package.json` aligned with the next Composer tag.
+2. Merge the release into `main`.
+3. Publish the matching GitHub release, for example `v0.6.0`.
+4. The release workflow runs the PHP and JavaScript suites, verifies the npm
+   tarball, and publishes it to GitHub Packages.
+
+The release workflow rejects a tag that does not exactly match
+`v${package.json.version}`.
