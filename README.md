@@ -455,7 +455,7 @@ to the package.
 
 ### Rates
 
-The rates module is framework-neutral and configured by each consumer:
+The core rates service is framework-neutral and configured by each consumer:
 
 ```js
 import { createRateService } from '@tafer-mx/laravel-platform/rates';
@@ -470,6 +470,24 @@ const plans = await rateService.getRatePlansBySuite(campaignCode, suiteId);
 If `baseUrl` is omitted, the service uses
 `https://middleware.taferresorts.com`. The package does not read Vite environment
 variables directly.
+
+For Alpine applications, register the packaged component factory and inject the
+consumer's Vite configuration at the application entrypoint:
+
+```js
+import Alpine from 'alpinejs';
+import { createRatesComponent } from '@tafer-mx/laravel-platform/rates/alpine';
+
+const rates = createRatesComponent({
+    baseUrl: import.meta.env.VITE_MIDDLEWARE_BASE_URL || undefined,
+});
+
+Alpine.data('rates', rates);
+```
+
+The Alpine component owns loading, manual-rate validation, API error handling,
+currency selection, and price formatting. Consumer Blade templates continue to
+provide `suiteId`, `campaignCode`, manual rates, and captions through `x-data`.
 
 ## npm Release Flow
 
