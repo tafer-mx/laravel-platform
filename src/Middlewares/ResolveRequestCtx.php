@@ -24,6 +24,10 @@ class ResolveRequestCtx
         $locale = RequestCtxSupport::getLocaleBySegments($segments);
 
         $this->requestCtx
+            ->setChildResort(RequestCtxSupport::getChildResortBySegments(
+                $segments,
+                $this->requestCtx->resort,
+            ))
             ->setLocale($locale['locale'])
             ->setLocation(RequestCtxSupport::getLocationBySegments($segments))
             ->setSlug(RequestCtxSupport::getSlugWithoutLocaleBySegments($segments))
