@@ -102,9 +102,9 @@ it('loads a child resort global configuration under the parent brand and locatio
     );
 
     expect($result)->toBe([
-        'full_slug' => 'brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta-sanctuary',
+        'full_slug' => 'brands/garza-blanca/puerto-vallarta/sanctuary/config_brand_puerto-vallarta-sanctuary',
     ])->and($service->arguments)->toBe([
-        'slug' => 'brands/garza-blanca/puerto-vallarta/config_brand_puerto-vallarta-sanctuary',
+        'slug' => 'brands/garza-blanca/puerto-vallarta/sanctuary/config_brand_puerto-vallarta-sanctuary',
         'isPreview' => true,
         'locale' => 'es',
     ]);

@@ -34,7 +34,7 @@ trait LoadsGlobalConfig
             && $childResort->hasRegion($ctx->location);
 
         if ($hasValidChildResort) {
-            return "{$locationRoot}/config_brand_{$ctx->location->value}-{$childResort->value}";
+            return "{$locationRoot}/{$childResort->value}/config_brand_{$ctx->location->value}-{$childResort->value}";
         }
 
         return "{$locationRoot}/config_brand_{$ctx->location->value}";
