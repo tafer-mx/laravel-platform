@@ -427,3 +427,43 @@ In the Laravel project's `composer.json`
 ```sh
 composer require tafer-mx/laravel-platform
 ```
+
+## Local development from a consumer
+
+Garza Blanca, Hotel Mousai and Villa Palmar can consume an unpublished checkout of this package through a Composer `path` repository. Sibling directories are the zero-configuration default:
+
+```text
+storyblok-projects/
+├── laravel-platform/
+├── garzablanca-vallarta-be/
+├── hotel-mousai/
+└── villa-palmar-cancun/
+```
+
+The package can live anywhere else by exporting its absolute path before invoking Composer:
+
+```bash
+export LARAVEL_PLATFORM_PATH=/absolute/path/to/laravel-platform
+composer platform:local
+```
+
+Each consumer's tracked `tooling/local-platform.php` launcher resolves the environment variable first and falls back to the sibling checkout. The generated path repository is relative for siblings and absolute for a custom location. `LARAVEL_PLATFORM_PATH` is local machine configuration and must not be added to the production Composer files.
+
+From a consumer repository, run:
+
+```bash
+composer platform:local
+composer platform:status
+composer test
+composer platform:release
+```
+
+`platform:local` calls `tooling/local-platform.php`, copies the production Composer definition into `composer.local.json`, starts `composer.local.lock` from the production lock and prepends this repository as a `path` repository with `symlink=true`. For the production constraint `^0.4`, the local-only repository advertises `0.4.999`; neither the production constraint nor its locked tag is changed.
+
+Because `vendor/tafer-mx/laravel-platform` is a symlink, edits in this checkout are immediately visible to the consumer. Run `platform:local` again after changing either production Composer file or this package's dependency metadata. The command is idempotent and refreshes both local Composer files.
+
+For Wodby, set `LARAVEL_PLATFORM_PATH` in the Docker directory's `.env`; each resort includes a complete `.env.example`. The value is the package path on the host and defaults to `../../laravel-platform`. Docker mounts it at the stable container path `/var/www/laravel-platform`, next to the consumer at `/var/www/html`, and injects that container path into PHP. After changing the path, recreate the consumer's `php`, `apache` and `node` services once. Run `platform:local` again whenever switching between host and container configurations so the ignored local Composer files contain the path for the current environment.
+
+`platform:status` reports whether `vendor` resolves to this checkout or to the published package. `platform:release` runs `composer install` against the production `composer.json` and `composer.lock`, then removes the local files. If installation fails, the local files remain so the failure can be diagnosed and the command can be retried.
+
+The generated `composer.local.json` and `composer.local.lock` are developer-only artifacts. They are ignored by every consumer and must never be committed. Releases, CI and deployments always use the stable constraint and tagged package recorded in `composer.json` and `composer.lock`.
