@@ -56,14 +56,23 @@ function writeJson(string $path, array $contents): void
 
 function syntheticVersion(string $constraint): string
 {
-    if (preg_match('/^\^(\d+)\.(\d+)(?:\.\d+)?$/', trim($constraint), $matches) !== 1) {
-        fail(
-            "El constraint productivo '{$constraint}' no es compatible con el flujo local. "
-            .'Se esperaba un constraint como ^0.4.',
-        );
+    $constraint = trim($constraint);
+
+    // Una versión productiva exacta puede usarse tal cual para el
+    // repositorio path local, de modo que satisfaga el mismo constraint.
+    if (preg_match('/^v?(\d+)\.(\d+)\.(\d+)$/', $constraint, $matches) === 1) {
+        return "{$matches[1]}.{$matches[2]}.{$matches[3]}";
     }
 
-    return "{$matches[1]}.{$matches[2]}.999";
+    // Para constraints caret usamos una versión sintética dentro del rango.
+    if (preg_match('/^\^(\d+)\.(\d+)(?:\.(\d+))?$/', $constraint, $matches) === 1) {
+        return "{$matches[1]}.{$matches[2]}.999";
+    }
+
+    fail(
+        "El constraint productivo '{$constraint}' no es compatible con el flujo local. "
+        .'Se esperaba una versión estable como 0.5.4 o un constraint como ^0.5.',
+    );
 }
 
 function repositoryPath(string $consumerRoot, string $platformRoot): string

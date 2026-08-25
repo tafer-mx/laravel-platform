@@ -5,7 +5,9 @@ namespace TAFER\Core\Services;
 use InvalidArgumentException;
 use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Uuid;
+use Storyblok\Api\Request\StoriesRequest;
 use Storyblok\Api\Request\StoryRequest;
+use Storyblok\Api\Response\StoriesResponse;
 use Storyblok\Api\Response\StoryResponse;
 use TAFER\Core\Contracts\StoryblokCache;
 use TAFER\Core\Contracts\StoryblokGateway;
@@ -16,7 +18,6 @@ use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokIdentity;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
 use Throwable;
-
 use function Illuminate\Support\defer;
 
 final readonly class CachedStoryblokService implements StoryblokGateway
@@ -81,6 +82,16 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         return $response;
     }
 
+    public function resolveRelation(mixed $relation, bool $draft = false, string $lang = 'en'): ?array
+    {
+        return $this->origin->resolveRelation($relation, $draft, $lang);
+    }
+
+    public function getStoriesByContentType(string $contentType, ?StoriesRequest $request = null): StoriesResponse
+    {
+        return $this->origin->getStoriesByContentType($contentType, $request);
+    }
+
     private function scheduleCacheWrite(
         StoryblokIdentity $identity,
         StoryResponse $response,
@@ -116,7 +127,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
     }
 
     /**
-     * @param  array<string, mixed>  $relation
+     * @param array<string, mixed> $relation
      */
     private function cacheRelation(
         array $relation,
@@ -152,7 +163,7 @@ final readonly class CachedStoryblokService implements StoryblokGateway
     }
 
     /**
-     * @param  array<string, mixed>  $story
+     * @param array<string, mixed> $story
      */
     private function identityFromStory(array $story, Locale $locale): StoryblokIdentity
     {
@@ -183,17 +194,5 @@ final readonly class CachedStoryblokService implements StoryblokGateway
         }
 
         return implode('/', $segments);
-    }
-
-    public function resolveRelation(mixed $relation, bool $draft = false, string $lang = 'en'): ?array
-    {
-        // Delegate to the origin service (which could be StoryblokService)
-        return $this->origin->resolveRelation($relation, $draft, $lang);
-    }
-    
-    public function getStoriesByContentType(string $contentType, array $filters = [], bool $draft = false, string $lang = 'en'): array {
-    
-        return $this->origin->getStoriesByContentType($contentType, $filters, $draft, $lang);
-
     }
 }
