@@ -14,10 +14,29 @@ trait LoadsGlobalConfig
             true,
         );
 
-        $slug = $locationScoped && ! $ctx->location->isCorp()
-            ? "brands/{$ctx->resort->value}/{$ctx->location->value}/config_brand_{$ctx->location->value}"
-            : "brands/{$ctx->resort->value}/config_brand";
+        $slug = $this->globalConfigSlug($ctx, $locationScoped);
 
         return $this->getStory($slug, $isPreview, $ctx->locale->value);
+    }
+
+    private function globalConfigSlug(RequestCtx $ctx, bool $locationScoped): string
+    {
+        $brandRoot = "brands/{$ctx->resort->value}";
+
+        if (! $locationScoped || $ctx->location->isCorp()) {
+            return "{$brandRoot}/config_brand";
+        }
+
+        $locationRoot = "{$brandRoot}/{$ctx->location->value}";
+        $childResort = isset($ctx->childResort) ? $ctx->childResort : null;
+        $hasValidChildResort = $childResort !== null
+            && $childResort->parent() === $ctx->resort
+            && $childResort->hasRegion($ctx->location);
+
+        if ($hasValidChildResort) {
+            return "{$locationRoot}/{$childResort->value}/config_brand_{$ctx->location->value}-{$childResort->value}";
+        }
+
+        return "{$locationRoot}/config_brand_{$ctx->location->value}";
     }
 }

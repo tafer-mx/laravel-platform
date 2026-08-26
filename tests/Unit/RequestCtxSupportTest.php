@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Location;
+use TAFER\Core\Enums\Resort;
 use TAFER\Core\Support\RequestCtxSupport;
 
 const URLS = [
@@ -80,6 +81,28 @@ it('returns slug without locale prefix from URL segments', function () {
         expect($slug)->toBe($expectedSlug);
     }
 });
+
+it('resolves a child resort from the exact location and resort pattern', function (array $segments) {
+    expect(RequestCtxSupport::getChildResortBySegments($segments, Resort::GarzaBlanca))
+        ->toBe(Resort::Sanctuary);
+})->with([
+    'without locale' => [['puerto-vallarta', 'sanctuary', 'suites']],
+    'Spanish locale' => [['es', 'puerto-vallarta', 'sanctuary', 'suites']],
+    'English locale' => [['en', 'puerto-vallarta', 'sanctuary', 'suites']],
+]);
+
+it('does not resolve a child resort outside the exact parent and region pattern', function (
+    array $segments,
+    Resort $parent,
+) {
+    expect(RequestCtxSupport::getChildResortBySegments($segments, $parent))->toBeNull();
+})->with([
+    'ordinary parent route' => [['puerto-vallarta', 'offers'], Resort::GarzaBlanca],
+    'missing location' => [['sanctuary', 'suites'], Resort::GarzaBlanca],
+    'child in a later segment' => [['puerto-vallarta', 'foo', 'sanctuary'], Resort::GarzaBlanca],
+    'unsupported region' => [['cancun', 'sanctuary'], Resort::GarzaBlanca],
+    'different parent resort' => [['puerto-vallarta', 'sanctuary'], Resort::HotelMousai],
+]);
 
 it('resolves device from the request user agent headers', function () {
     $mobileRequest = Request::create(

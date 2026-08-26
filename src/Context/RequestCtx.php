@@ -20,6 +20,8 @@ class RequestCtx
 {
     public readonly Resort $resort;
 
+    public readonly ?Resort $childResort;
+
     public readonly Locale $locale;
 
     public readonly Location $location;
@@ -34,6 +36,18 @@ class RequestCtx
     {
         $this->resort = Resort::tryFrom($brandSlug)
             ?? throw new InvalidArgumentException("Invalid resort slug: {$brandSlug}");
+    }
+
+    public function setChildResort(?Resort $childResort): self
+    {
+        $this->setOnce('childResort', $childResort);
+
+        return $this;
+    }
+
+    public function effectiveResort(): Resort
+    {
+        return isset($this->childResort) ? $this->childResort : $this->resort;
     }
 
     public function setLocale(Locale $locale): self

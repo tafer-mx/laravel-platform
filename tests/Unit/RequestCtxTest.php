@@ -11,7 +11,8 @@ use TAFER\Core\Storyblok\StoryblokRequestFactory;
 it('creates a request context from a valid brand slug', function () {
     $requestCtx = new RequestCtx('garza-blanca');
 
-    expect($requestCtx->resort)->toBe(Resort::GarzaBlanca);
+    expect($requestCtx->resort)->toBe(Resort::GarzaBlanca)
+        ->and($requestCtx->effectiveResort())->toBe(Resort::GarzaBlanca);
 });
 
 it('rejects invalid brand slugs', function () {
@@ -34,6 +35,28 @@ it('sets request context values fluently', function () {
         ->and($requestCtx->device)->toBe(Device::Mobile)
         ->and($requestCtx->device->isMobile())->toBeTrue();
 });
+
+it('uses the child resort as the effective resort without changing the parent resort', function () {
+    $requestCtx = (new RequestCtx('garza-blanca'))
+        ->setChildResort(Resort::Sanctuary)
+        ->setLocale(Locale::English)
+        ->setLocation(Location::PuertoVallarta)
+        ->setSlug('puerto-vallarta/sanctuary/suites')
+        ->setIsPreview(false)
+        ->setDevice(Device::Desktop);
+
+    expect($requestCtx->resort)->toBe(Resort::GarzaBlanca)
+        ->and($requestCtx->childResort)->toBe(Resort::Sanctuary)
+        ->and($requestCtx->effectiveResort())->toBe(Resort::Sanctuary)
+        ->and($requestCtx->storyblokSlug())
+        ->toBe('brands/garza-blanca/puerto-vallarta/sanctuary/suites');
+});
+
+it('does not allow the child resort to be resolved twice', function () {
+    $requestCtx = (new RequestCtx('garza-blanca'))->setChildResort(null);
+
+    $requestCtx->setChildResort(Resort::Sanctuary);
+})->throws(LogicException::class, 'RequestCtx property [childResort] has already been set.');
 
 it('does not allow a request context property to be set twice', function () {
     $requestCtx = (new RequestCtx('garza-blanca'))
