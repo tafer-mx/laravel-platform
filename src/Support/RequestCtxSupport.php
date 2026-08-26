@@ -8,6 +8,7 @@ use Jenssegers\Agent\Agent;
 use TAFER\Core\Enums\Device;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Enums\Location;
+use TAFER\Core\Enums\Resort;
 
 class RequestCtxSupport
 {
@@ -52,6 +53,29 @@ class RequestCtxSupport
         }
 
         return implode('/', $segments) ?: '/';
+    }
+
+    /**
+     * @param  string[]  $segments
+     */
+    public static function getChildResortBySegments(array $segments, Resort $parent): ?Resort
+    {
+        if (isset($segments[0]) && Locale::tryFrom(Str::lower($segments[0])) !== null) {
+            array_shift($segments);
+        }
+
+        $location = Location::tryFrom(Str::lower($segments[0] ?? ''));
+        $candidate = Resort::tryFrom(Str::lower($segments[1] ?? ''));
+
+        if ($location === null || $candidate === null) {
+            return null;
+        }
+
+        if ($candidate->parent() !== $parent || ! $candidate->hasRegion($location)) {
+            return null;
+        }
+
+        return $candidate;
     }
 
     public static function getDeviceByRequest(Request $request): Device

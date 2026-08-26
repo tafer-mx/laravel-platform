@@ -8,6 +8,8 @@ use Storyblok\Api\Domain\Value\Dto\Version;
 use Storyblok\Api\Domain\Value\Uuid;
 use Storyblok\Api\Request\StoryRequest;
 use Storyblok\Api\Response\StoryResponse;
+use Storyblok\Api\Request\StoriesRequest;
+use Storyblok\Api\Response\StoriesResponse;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
 use TAFER\Core\Services\CachedStoryblokService;
@@ -75,9 +77,9 @@ function countingStoryblokGateway(StoryResponse $response): StoryblokGateway
             return null;
         }
         
-        public function getStoriesByContentType(string $contentType, array $filters = [], bool $draft = false, string $lang = 'en'): array
+        public function getStoriesByContentType(string $contentType, ?StoriesRequest $request = null): StoriesResponse
         {
-            return [];
+            throw new \BadMethodCallException('getStoriesByContentType was not expected in this test.');
         }
     };
 }
