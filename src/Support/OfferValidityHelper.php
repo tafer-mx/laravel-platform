@@ -12,7 +12,6 @@ final class OfferValidityHelper
     private const STATUS_ACTIVE = 'active';
     private const STATUS_OPAQUE = 'opaque';
     private const STATUS_INACTIVE = 'inactive';
-
     private const ACTIVATION_WEEKLY = 'weekly';
     private const ACTIVATION_DATE_RANGES = 'date_ranges';
 
@@ -25,6 +24,7 @@ final class OfferValidityHelper
      *     isConditional: bool,
      *     status: string,
      *     activation: string,
+     *     startDate: ?Carbon,
      *     nextEnd: ?Carbon,
      *     reason: string
      * }
@@ -42,7 +42,6 @@ final class OfferValidityHelper
             : Carbon::now($timezone);
 
         $status = $context->get('status');
-
         $activation = $context->get('activation');
 
         /*
@@ -79,6 +78,7 @@ final class OfferValidityHelper
                 isConditional: true,
                 status: $status,
                 activation: $activation,
+                startDate: $weeklyResult['startDate'],
                 nextEnd: $weeklyResult['nextEnd'],
                 reason: $weeklyResult['reason'],
             );
@@ -105,6 +105,7 @@ final class OfferValidityHelper
                 isConditional: true,
                 status: $status,
                 activation: $activation,
+                startDate: $rangesResult['startDate'],
                 nextEnd: $rangesResult['nextEnd'],
                 reason: $rangesResult['reason'],
             );
@@ -144,6 +145,7 @@ final class OfferValidityHelper
      *
      * @return array{
      *     isActive: bool,
+     *     startDate: ?Carbon,
      *     nextEnd: ?Carbon,
      *     reason: string
      * }
@@ -155,6 +157,7 @@ final class OfferValidityHelper
         if (! is_array($recurringDays)) {
             return [
                 'isActive' => false,
+                'startDate' => null,
                 'nextEnd' => null,
                 'reason' => 'invalid_recurring_days',
             ];
@@ -163,12 +166,14 @@ final class OfferValidityHelper
         if ($recurringDays === []) {
             return [
                 'isActive' => false,
+                'startDate' => null,
                 'nextEnd' => null,
                 'reason' => 'empty_recurring_days',
             ];
         }
 
-        $currentDay = strtolower($now->englishDayOfWeek);
+        $currentDate = Carbon::instance($now);
+        $currentDay = strtolower($currentDate->englishDayOfWeek);
 
         $isActive = in_array(
             $currentDay,
@@ -176,14 +181,45 @@ final class OfferValidityHelper
             true
         );
 
+        if (! $isActive) {
+            return [
+                'isActive' => false,
+                'startDate' => null,
+                'nextEnd' => null,
+                'reason' => 'weekly_inactive',
+            ];
+        }
+
+        $startDate = $currentDate->copy()->startOfDay();
+        $nextEnd = $currentDate->copy()->endOfDay();
+
+        for ($offset = 1; $offset <= 6; $offset++) {
+            $previousDate = $currentDate->copy()->subDays($offset);
+            $previousDay = strtolower($previousDate->englishDayOfWeek);
+
+            if (! in_array($previousDay, $recurringDays, true)) {
+                break;
+            }
+
+            $startDate = $previousDate->startOfDay();
+        }
+
+        for ($offset = 1; $offset <= 6; $offset++) {
+            $nextDate = $currentDate->copy()->addDays($offset);
+            $nextDay = strtolower($nextDate->englishDayOfWeek);
+
+            if (! in_array($nextDay, $recurringDays, true)) {
+                break;
+            }
+
+            $nextEnd = $nextDate->endOfDay();
+        }
+
         return [
-            'isActive' => $isActive,
-            'nextEnd' => $isActive
-                ? Carbon::instance($now)->endOfDay()
-                : null,
-            'reason' => $isActive
-                ? 'weekly_active'
-                : 'weekly_inactive',
+            'isActive' => true,
+            'startDate' => $startDate,
+            'nextEnd' => $nextEnd,
+            'reason' => 'weekly_active',
         ];
     }
 
@@ -193,6 +229,7 @@ final class OfferValidityHelper
      *
      * @return array{
      *     isActive: bool,
+     *     startDate: ?Carbon,
      *     nextEnd: ?Carbon,
      *     reason: string
      * }
@@ -205,6 +242,7 @@ final class OfferValidityHelper
         if (! is_array($ranges) || $ranges === []) {
             return [
                 'isActive' => false,
+                'startDate' => null,
                 'nextEnd' => null,
                 'reason' => 'empty_date_ranges',
             ];
@@ -257,6 +295,7 @@ final class OfferValidityHelper
         if ($activeRanges === []) {
             return [
                 'isActive' => false,
+                'startDate' => null,
                 'nextEnd' => null,
                 'reason' => 'outside_date_ranges',
             ];
@@ -275,6 +314,7 @@ final class OfferValidityHelper
 
         return [
             'isActive' => true,
+            'startDate' => $activeRanges[0]['start'],
             'nextEnd' => $activeRanges[0]['end'],
             'reason' => 'date_range_active',
         ];
@@ -291,13 +331,13 @@ final class OfferValidityHelper
         );
     }
 
-
     private static function result(
         bool $shouldRender,
         bool $isOpaque,
         bool $isConditional,
         string $status,
         string $activation,
+        ?Carbon $startDate = null,
         ?Carbon $nextEnd = null,
         string $reason = '',
     ): array {
@@ -307,6 +347,7 @@ final class OfferValidityHelper
             'isConditional' => $isConditional,
             'status' => $status,
             'activation' => $activation,
+            'startDate' => $startDate,
             'nextEnd' => $nextEnd,
             'reason' => $reason,
         ];
