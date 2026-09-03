@@ -22,6 +22,19 @@ final class StoryblokBlockContext
         // Agregar más mapeos según sea necesario
     ];
 
+    private const COLLECTION_NORMALIZATION_MAP = [
+        'offer_data' => [
+            'pdf-array' => [
+                'target' => 'files',
+                'map' => [
+                    'pdf.filename' => 'link',
+                    'pdf.alt' => 'alt_text',
+                ],
+            ],
+        ],
+        // Agregar más colecciones según sea necesario
+    ];
+
     public function __construct(
         public readonly ?array $story = null,
         public readonly ?array $content = null,
@@ -69,7 +82,14 @@ final class StoryblokBlockContext
     {
         $component = $content['component'] ?? null;
 
-        if ($component === null || ! isset(self::NORMALIZATION_MAP[$component])) {
+        if ($component === null) {
+            return $content;
+        }
+
+        $hasNormalization = isset(self::NORMALIZATION_MAP[$component]);
+        $hasCollectionNormalization = isset(self::COLLECTION_NORMALIZATION_MAP[$component]);
+
+        if (! $hasNormalization && ! $hasCollectionNormalization) {
             return $content;
         }
 
@@ -78,12 +98,42 @@ final class StoryblokBlockContext
             'component' => $component,
         ];
 
-        foreach (self::NORMALIZATION_MAP[$component] as $source => $target) {
+        foreach (self::NORMALIZATION_MAP[$component] ?? [] as $source => $target) {
             $value = data_get($content, $source);
 
             if ($value !== null) {
                 $normalized[$target] = $value;
             }
+        }
+
+        foreach (self::COLLECTION_NORMALIZATION_MAP[$component] ?? [] as $source => $config) {
+            $items = data_get($content, $source);
+
+            if (! is_array($items)) {
+                continue;
+            }
+
+            $normalizedItems = [];
+
+            foreach ($items as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+
+                $normalizedItem = [];
+
+                foreach ($config['map'] as $itemSource => $itemTarget) {
+                    $value = data_get($item, $itemSource);
+
+                    if ($value !== null) {
+                        $normalizedItem[$itemTarget] = $value;
+                    }
+                }
+
+                $normalizedItems[] = $normalizedItem;
+            }
+
+            $normalized[$config['target']] = $normalizedItems;
         }
 
         return $normalized;
