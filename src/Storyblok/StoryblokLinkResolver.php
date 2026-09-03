@@ -8,6 +8,7 @@ use Storyblok\Api\Domain\Value\Uuid;
 use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Middlewares\ResolveRequestCtx;
+use TAFER\Core\Services\StoryblokContextResolver;
 
 // TODO: This implementation was moved as-is from the consumer projects and should be refactored into a more optimal design.
 /**
@@ -64,6 +65,15 @@ class StoryblokLinkResolver
     public static function resolve(?array $link, string $lang = 'en'): string
     {
         if (! $link) {
+            try {
+                $context = app(StoryblokContextResolver::class)->current();
+                $link = $context->get('link');
+            } catch (\Throwable) {
+                $link = '';
+            }
+        }
+
+        if (! $link) {
             return '';
         }
 
@@ -96,7 +106,6 @@ class StoryblokLinkResolver
         if (! empty($link['id']) && ($link['linktype'] ?? '') === 'story') {
             $uuid = $link['id'];
 
-            // Try resolved links from the current API response first
             if (isset(self::$resolvedLinks[$uuid]['url'])) {
                 return self::toPublicUrl('/'.self::$resolvedLinks[$uuid]['url']);
             }
@@ -105,7 +114,6 @@ class StoryblokLinkResolver
                 return self::toPublicUrl('/'.self::$resolvedLinks[$uuid]['slug']);
             }
 
-            // Last resort: fetch from API by UUID
             return self::resolveByUuid($uuid, $lang);
         }
 
