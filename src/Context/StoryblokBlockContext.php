@@ -40,6 +40,15 @@ final class StoryblokBlockContext
                 ],
             ],
         ],
+        'offer_data' => [
+            'pdf-array' => [
+                'target' => 'files',
+                'map' => [
+                    'pdf.filename' => 'link',
+                    'pdf.alt' => 'alt_text',
+                ],
+            ],
+        ],
     ];
 
     public function __construct(
