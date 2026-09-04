@@ -24,6 +24,7 @@ use TAFER\Core\Services\ReviewsService;
 use TAFER\Core\Services\StoryblokContextResolver;
 use TAFER\Core\Services\StoryblokService;
 use TAFER\Core\Services\StoryblokVariableResolver;
+use TAFER\Core\Services\SuitesEntityService;
 use TAFER\Core\Storyblok\LaravelStoryblokCache;
 use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
@@ -152,6 +153,8 @@ class TAFERServiceProvider extends ServiceProvider
 
         // Resolver de variables (singleton = stateless, no necesita resetearse)
         $this->app->singleton(StoryblokVariableResolver::class);
+
+        $this->app->singleton(SuitesEntityService::class);
     }
 
     public function boot(): void
