@@ -19,10 +19,27 @@ final class StoryblokBlockContext
             'validity_recurring_days' => 'date_recurring_days',
             'validity_date_time_range' => 'date_time_range',
         ],
-        // Agregar más mapeos según sea necesario
+        'suites-data' => [
+            'title' => 'title',
+            'image' => 'image',
+            'beds' => 'beds',
+            'view' => 'view',
+            'suite_link' => 'link',
+        ],
     ];
 
     private const COLLECTION_NORMALIZATION_MAP = [
+        'suites-data' => [
+            'amenities' => [
+                'target' => 'amenities',
+                'component' => 'basic-amenetie-icon',
+                'map' => [
+                    'image_icon.filename' => 'icon',
+                    'text' => 'label',
+                    'alt' => 'alt_text',
+                ],
+            ],
+        ],
         'offer_data' => [
             'pdf-array' => [
                 'target' => 'files',
@@ -32,7 +49,6 @@ final class StoryblokBlockContext
                 ],
             ],
         ],
-        // Agregar más colecciones según sea necesario
     ];
 
     public function __construct(
@@ -54,13 +70,12 @@ final class StoryblokBlockContext
     {
         $content = $story['content'] ?? null;
 
-        // Normalizar contenido si es necesario
         if ($content !== null) {
             $content = $this->normalizeContent($content);
         }
 
         return new self(
-            story: null, // No necesitamos el story completo, solo el content
+            story: null,
             content: $content,
         );
     }
@@ -75,9 +90,6 @@ final class StoryblokBlockContext
         return data_get($this->content, $key) !== null;
     }
 
-    /**
-     * Normaliza el contenido según el tipo de componente
-     */
     private function normalizeContent(array $content): array
     {
         $component = $content['component'] ?? null;
@@ -93,7 +105,6 @@ final class StoryblokBlockContext
             return $content;
         }
 
-        // Crear un nuevo array solo con los campos normalizados
         $normalized = [
             'component' => $component,
         ];
@@ -120,6 +131,13 @@ final class StoryblokBlockContext
                     continue;
                 }
 
+                if (
+                    isset($config['component'])
+                    && ($item['component'] ?? null) !== $config['component']
+                ) {
+                    continue;
+                }
+
                 $normalizedItem = [];
 
                 foreach ($config['map'] as $itemSource => $itemTarget) {
@@ -130,7 +148,9 @@ final class StoryblokBlockContext
                     }
                 }
 
-                $normalizedItems[] = $normalizedItem;
+                if ($normalizedItem !== []) {
+                    $normalizedItems[] = $normalizedItem;
+                }
             }
 
             $normalized[$config['target']] = $normalizedItems;
