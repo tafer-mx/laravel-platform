@@ -7,7 +7,8 @@ it('has the expected resort slugs', function () {
     expect(Resort::GarzaBlanca->value)->toBe('garza-blanca')
         ->and(Resort::HotelMousai->value)->toBe('mousai')
         ->and(Resort::VillaPalmarCancun->value)->toBe('villa-palmar-cancun')
-        ->and(Resort::Sanctuary->value)->toBe('sanctuary');
+        ->and(Resort::Sanctuary->value)->toBe('sanctuary')
+        ->and(Resort::SierraLago->value)->toBe('sierra-lago');
 });
 
 it('gets resort region codes', function () {
@@ -15,7 +16,8 @@ it('gets resort region codes', function () {
         ->and(Resort::GarzaBlanca->regionCode(Location::PuertoVallarta))->toBe('GBPV')
         ->and(Resort::Sanctuary->regionCode(Location::PuertoVallarta))->toBe('SNCTRY')
         ->and(Resort::VillaPalmarCancun->regionCode(Location::Corp))->toBe('VPCN')
-        ->and(Resort::VillaPalmarCancun->regionCode(Location::Cabo))->toBeNull();
+        ->and(Resort::VillaPalmarCancun->regionCode(Location::Cabo))->toBeNull()
+        ->and(Resort::SierraLago->regionCode(Location::PuertoVallarta))->toBe('SLPV');
 });
 
 it('checks if a resort has a region', function () {
@@ -39,5 +41,9 @@ describe('Gets the region by a code', function () {
 
     it('Villa Palmar Cancun (VP)', function () {
         expect(Resort::resortByRegionCode('VPCN'))->toEqual(Resort::VillaPalmarCancun);
+    });
+
+    it('Sierra Lago (SL)', function () {
+        expect(Resort::resortByRegionCode('SLPV'))->toEqual(Resort::SierraLago);
     });
 });
