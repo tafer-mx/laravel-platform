@@ -7,7 +7,15 @@ it('has the expected location slugs', function () {
     expect(Location::Cancun->value)->toBe('cancun')
         ->and(Location::PuertoVallarta->value)->toBe('puerto-vallarta')
         ->and(Location::Cabo->value)->toBe('los-cabos')
+        ->and(Location::Mascota->value)->toBe('mascota')
         ->and(Location::Corp->value)->toBe('corp');
+});
+
+it('exposes the Mascota location label and code', function () {
+    expect(Location::Mascota->label(Locale::English))->toBe('Mascota')
+        ->and(Location::Mascota->label(Locale::Spanish))->toBe('Mascota')
+        ->and(Location::Mascota->code())->toBe('MS')
+        ->and(Location::fromCode('MS'))->toBe(Location::Mascota);
 });
 
 it('gets translated location labels', function () {

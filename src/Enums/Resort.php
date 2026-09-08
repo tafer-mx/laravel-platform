@@ -13,6 +13,7 @@ enum Resort: string
     case HotelMousai = 'mousai';
     case VillaPalmarCancun = 'villa-palmar-cancun';
     case Sanctuary = 'sanctuary';
+    case SierraLago = 'sierra-lago';
 
     /**
      * Get the human-readable resort name.
@@ -24,6 +25,7 @@ enum Resort: string
             self::HotelMousai => 'Hotel Mousai',
             self::VillaPalmarCancun => 'Villa Palmar Cancun',
             self::Sanctuary => 'Sanctuary',
+            self::SierraLago => 'Sierra Lago Resort & Spa',
         };
     }
 
@@ -37,6 +39,7 @@ enum Resort: string
             self::HotelMousai => 'MS',
             self::VillaPalmarCancun => 'VP',
             self::Sanctuary => 'SNCTRY',
+            self::SierraLago => 'SL',
         };
     }
 
@@ -66,6 +69,10 @@ enum Resort: string
 
             self::Sanctuary => [
                 new ResortRegion(Location::PuertoVallarta, 'SNCTRY'),
+            ],
+
+            self::SierraLago => [
+                new ResortRegion(Location::Mascota, 'SLMS'),
             ],
         };
     }

@@ -10,6 +10,7 @@ enum Location: string
     case Cancun = 'cancun';
     case PuertoVallarta = 'puerto-vallarta';
     case Cabo = 'los-cabos';
+    case Mascota = 'mascota';
     case Corp = 'corp';
 
     /**
@@ -44,6 +45,11 @@ enum Location: string
                 Locale::Spanish => 'Los Cabos',
             },
 
+            self::Mascota => match ($lang) {
+                Locale::English,
+                Locale::Spanish => 'Mascota',
+            },
+
             self::Corp => match ($lang) {
                 Locale::English => 'Corporate',
                 Locale::Spanish => 'Corporativo',
@@ -57,6 +63,7 @@ enum Location: string
             self::Cancun => 'CN',
             self::PuertoVallarta => 'PV',
             self::Cabo => 'LC',
+            self::Mascota => 'MS',
         };
     }
 
@@ -66,6 +73,7 @@ enum Location: string
             'CN' => self::Cancun,
             'PV' => self::PuertoVallarta,
             'LC' => self::Cabo,
+            'MS' => self::Mascota,
             default => null,
         };
     }
