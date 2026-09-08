@@ -17,7 +17,7 @@ it('gets resort region codes', function () {
         ->and(Resort::Sanctuary->regionCode(Location::PuertoVallarta))->toBe('SNCTRY')
         ->and(Resort::VillaPalmarCancun->regionCode(Location::Corp))->toBe('VPCN')
         ->and(Resort::VillaPalmarCancun->regionCode(Location::Cabo))->toBeNull()
-        ->and(Resort::SierraLago->regionCode(Location::PuertoVallarta))->toBe('SLPV');
+        ->and(Resort::SierraLago->regionCode(Location::Mascota))->toBe('SLMS');
 });
 
 it('checks if a resort has a region', function () {
@@ -44,6 +44,6 @@ describe('Gets the region by a code', function () {
     });
 
     it('Sierra Lago (SL)', function () {
-        expect(Resort::resortByRegionCode('SLPV'))->toEqual(Resort::SierraLago);
+        expect(Resort::resortByRegionCode('SLMS'))->toEqual(Resort::SierraLago);
     });
 });

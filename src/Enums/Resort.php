@@ -72,7 +72,7 @@ enum Resort: string
             ],
 
             self::SierraLago => [
-                new ResortRegion(Location::PuertoVallarta, 'SLPV'),
+                new ResortRegion(Location::Mascota, 'SLMS'),
             ],
         };
     }
