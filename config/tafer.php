@@ -45,4 +45,12 @@ return [
             'namespace' => 'mousai',
         ],
     ],
+
+    /*
+    | Suite entities (component: suites-data) under brands/{brand}/{entities_path}/.
+    | Used by SuitesEntityService and shared suite listing filters.
+    */
+    'suites' => [
+        'entities_path' => 'entities/suites',
+    ],
 ];

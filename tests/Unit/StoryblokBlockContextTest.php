@@ -147,6 +147,69 @@ it('normalizes offer_data component', function () {
         ]);
 });
 
+it('normalizes suites-data component', function () {
+    $story = [
+        'content' => [
+            'component' => 'suites-data',
+            'title' => 'Deluxe Suite',
+            'beds' => 1,
+            'view' => 'ocean-view',
+            'suite_link' => ['url' => '/suites/deluxe'],
+            'amenities' => [
+                [
+                    'component' => 'basic-amenetie-icon',
+                    'text' => 'WiFi',
+                    'alt' => 'WiFi icon',
+                    'image_icon' => ['filename' => 'wifi.svg'],
+                ],
+            ],
+        ],
+    ];
+
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
+
+    expect($context->get('title'))->toBe('Deluxe Suite')
+        ->and($context->get('beds'))->toBe(1)
+        ->and($context->get('view'))->toBe('ocean-view')
+        ->and($context->get('link'))->toBe(['url' => '/suites/deluxe'])
+        ->and($context->get('amenities'))->toBe([
+            [
+                'icon' => 'wifi.svg',
+                'label' => 'WiFi',
+                'alt_text' => 'WiFi icon',
+            ],
+        ]);
+});
+
+it('ignores amenity blocks with a different component', function () {
+    $story = [
+        'content' => [
+            'component' => 'suites-data',
+            'amenities' => [
+                [
+                    'component' => 'legacy-icon',
+                    'text' => 'Legacy',
+                    'image_icon' => ['filename' => 'legacy.svg'],
+                ],
+                [
+                    'component' => 'basic-amenetie-icon',
+                    'text' => 'WiFi',
+                    'image_icon' => ['filename' => 'wifi.svg'],
+                ],
+            ],
+        ],
+    ];
+
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
+
+    expect($context->get('amenities'))->toBe([
+        [
+            'icon' => 'wifi.svg',
+            'label' => 'WiFi',
+        ],
+    ]);
+});
+
 it('does not normalize unknown components', function () {
     $story = [
         'content' => [
