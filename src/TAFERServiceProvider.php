@@ -154,7 +154,7 @@ class TAFERServiceProvider extends ServiceProvider
         // Resolver de variables (singleton = stateless, no necesita resetearse)
         $this->app->singleton(StoryblokVariableResolver::class);
 
-        $this->app->singleton(SuitesEntityService::class);
+        $this->app->scoped(SuitesEntityService::class);
     }
 
     public function boot(): void
