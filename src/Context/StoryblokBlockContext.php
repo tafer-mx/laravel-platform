@@ -25,6 +25,7 @@ final class StoryblokBlockContext
             'beds' => 'beds',
             'view' => 'view',
             'suite_link' => 'link',
+            'virtual_tour_url' => 'virtual_tour_url',
         ],
     ];
 
@@ -58,7 +59,7 @@ final class StoryblokBlockContext
 
     public static function empty(): self
     {
-        return new self();
+        return new self;
     }
 
     public function isEmpty(): bool

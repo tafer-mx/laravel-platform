@@ -25,7 +25,6 @@ use TAFER\Core\Context\StoryblokBlockContext;
  * Esto permite que las vistas usen campos consistentes independientemente de
  * la estructura interna del componente.
  */
-
 it('creates an empty context', function () {
     $context = StoryblokBlockContext::empty();
 
@@ -155,6 +154,7 @@ it('normalizes suites-data component', function () {
             'beds' => 1,
             'view' => 'ocean-view',
             'suite_link' => ['url' => '/suites/deluxe'],
+            'virtual_tour_url' => 'https://my.matterport.com/show/?m=nJgwe5Y1CbW',
             'amenities' => [
                 [
                     'component' => 'basic-amenetie-icon',
@@ -172,6 +172,7 @@ it('normalizes suites-data component', function () {
         ->and($context->get('beds'))->toBe(1)
         ->and($context->get('view'))->toBe('ocean-view')
         ->and($context->get('link'))->toBe(['url' => '/suites/deluxe'])
+        ->and($context->get('virtual_tour_url'))->toBe('https://my.matterport.com/show/?m=nJgwe5Y1CbW')
         ->and($context->get('amenities'))->toBe([
             [
                 'icon' => 'wifi.svg',

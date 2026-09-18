@@ -1,5 +1,6 @@
 <?php
 
+use TAFER\Core\Context\StoryblokBlockContext;
 use TAFER\Core\Support\SuiteEntityHelper;
 
 it('normalizes suites-data component with beds and view fields', function () {
@@ -23,7 +24,7 @@ it('normalizes suites-data component with beds and view fields', function () {
         ],
     ];
 
-    $context = TAFER\Core\Context\StoryblokBlockContext::empty()->withResolvedStory($story);
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
 
     expect($context->get('component'))->toBe('suites-data')
         ->and($context->get('title'))->toBe('Deluxe Ocean View Suite')
@@ -69,6 +70,59 @@ it('maps a suites-data story into a normalized suite payload', function () {
     ])->and($suite['amenities'])->toBe([
         ['label' => 'Balcony', 'icon' => 'balcony.svg'],
     ]);
+});
+
+it('exposes the virtual tour url in the suite payload', function () {
+    $suite = SuiteEntityHelper::fromStory([
+        'uuid' => 'suite-uuid-1',
+        'name' => 'Deluxe Suite',
+        'content' => [
+            'component' => 'suites-data',
+            'virtual_tour_url' => 'https://my.matterport.com/show/?m=nJgwe5Y1CbW',
+        ],
+    ]);
+
+    expect($suite['virtual_tour_url'])->toBe('https://my.matterport.com/show/?m=nJgwe5Y1CbW');
+});
+
+it('returns null when the virtual tour url is missing or empty', function () {
+    foreach ([null, '', '   ', 123, ['url' => 'https://example.com']] as $value) {
+        $content = ['component' => 'suites-data'];
+
+        if ($value !== null) {
+            $content['virtual_tour_url'] = $value;
+        }
+
+        $suite = SuiteEntityHelper::fromStory(['name' => 'Suite', 'content' => $content]);
+
+        expect($suite['virtual_tour_url'])->toBeNull();
+    }
+});
+
+it('accepts virtual tour urls with an uppercase scheme', function () {
+    $suite = SuiteEntityHelper::fromStory([
+        'name' => 'Suite',
+        'content' => [
+            'component' => 'suites-data',
+            'virtual_tour_url' => 'HTTPS://my.matterport.com/show/?m=abc',
+        ],
+    ]);
+
+    expect($suite['virtual_tour_url'])->toBe('HTTPS://my.matterport.com/show/?m=abc');
+});
+
+it('rejects virtual tour urls with an unsupported scheme', function () {
+    foreach (['javascript:alert(1)', 'ftp://example.com/tour', '/relative/tour', 'my.matterport.com/show'] as $value) {
+        $suite = SuiteEntityHelper::fromStory([
+            'name' => 'Suite',
+            'content' => [
+                'component' => 'suites-data',
+                'virtual_tour_url' => $value,
+            ],
+        ]);
+
+        expect($suite['virtual_tour_url'])->toBeNull();
+    }
 });
 
 it('builds filters dynamically from suite tags', function () {
