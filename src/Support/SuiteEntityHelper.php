@@ -22,6 +22,7 @@ final class SuiteEntityHelper
      *     link: mixed,
      *     beds: int|null,
      *     view: string|null,
+     *     virtual_tour_url: string|null,
      *     amenities: list<array{label: string, icon: mixed}>,
      *     tags: list<string>
      * }
@@ -40,6 +41,7 @@ final class SuiteEntityHelper
             'link' => $context->get('link'),
             'beds' => $beds,
             'view' => $view,
+            'virtual_tour_url' => self::normalizeVirtualTourUrl($context->get('virtual_tour_url')),
             'amenities' => array_values(array_filter(
                 array_map(
                     static fn (array $a): array => [
@@ -186,6 +188,19 @@ final class SuiteEntityHelper
         $view = trim($view);
 
         return $view !== '' ? $view : null;
+    }
+
+    /**
+     * Limpia la URL del recorrido virtual a string o null.
+     *
+     * El valor termina en el src de un iframe, así que solo se aceptan
+     * URLs absolutas http/https: cualquier otro esquema se descarta.
+     */
+    private static function normalizeVirtualTourUrl(mixed $url): ?string
+    {
+        $url = is_string($url) ? $url : '';
+
+        return Str::startsWith(Str::lower($url), ['http://', 'https://']) ? $url : null;
     }
 
     /**
