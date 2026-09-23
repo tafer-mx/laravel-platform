@@ -21,8 +21,17 @@ class RequestCtxSupport
         $firstSegment = Str::lower($segments[0] ?? '');
         $locale = Locale::tryFrom($firstSegment);
 
+        $defaultLocale = Locale::English;
+
+        try {
+            $defaultLocale = Locale::tryFrom((string) config('app.locale', Locale::English->value))
+                ?? Locale::English;
+        } catch (\Throwable) {
+            // The package can also be used outside a booted Laravel application.
+        }
+
         return [
-            'locale' => $locale ?? Locale::English,
+            'locale' => $locale ?? $defaultLocale,
             'explicit' => $locale !== null,
         ];
     }
