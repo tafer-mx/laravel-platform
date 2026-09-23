@@ -37,9 +37,24 @@ class RedirectLegacyHomePrefix
 
         $localeInfo = RequestCtxSupport::getLocaleBySegments($request->segments());
         $cleanPath = $this->cleanPath();
+        $defaultLocale = $this->defaultLocale();
+        $usesSierraSpanishRouting = $this->ctx->resort === Resort::SierraLago
+            && $defaultLocale === Locale::Spanish;
 
-        if ($localeInfo['explicit'] && $localeInfo['locale'] === Locale::English) {
+        if (
+            $localeInfo['explicit']
+            && $localeInfo['locale'] === Locale::English
+            && ! $usesSierraSpanishRouting
+        ) {
             return redirect($cleanPath);
+        }
+
+        if (
+            $localeInfo['explicit']
+            && $localeInfo['locale'] === Locale::Spanish
+            && $usesSierraSpanishRouting
+        ) {
+            abort(404);
         }
 
         if (! $this->usesLocationPrefixes() && ! $this->ctx->location->isCorp()) {
@@ -51,14 +66,22 @@ class RedirectLegacyHomePrefix
         }
 
         if ($this->ctx->location->isCorp()) {
-            $prefix = $this->ctx->locale === Locale::Spanish ? "es{$cleanPath}" : $cleanPath;
+            $prefix = $usesSierraSpanishRouting
+                ? ($localeInfo['explicit'] ? $this->ctx->locale->value.$cleanPath : $cleanPath)
+                : ($this->ctx->locale === Locale::Spanish ? "es{$cleanPath}" : $cleanPath);
             $prefix = trim($prefix, '/');
 
             if ($prefix !== '' && Str::doesntStartWith($requestPath, $prefix)) {
                 abort(404);
             }
         } else {
-            $prefix = $this->ctx->locale === Locale::Spanish ? "es/{$this->ctx->location->value}" : $this->ctx->location->value;
+            $prefix = $usesSierraSpanishRouting
+                ? ($localeInfo['explicit']
+                    ? "{$this->ctx->locale->value}/{$this->ctx->location->value}"
+                    : $this->ctx->location->value)
+                : ($this->ctx->locale === Locale::Spanish
+                    ? "es/{$this->ctx->location->value}"
+                    : $this->ctx->location->value);
             if (Str::doesntStartWith($requestPath, $prefix)) {
                 abort(404);
             }
@@ -122,5 +145,18 @@ class RedirectLegacyHomePrefix
             $this->ctx->isPreview,
             $this->ctx->device,
         );
+    }
+
+    private function defaultLocale(): Locale
+    {
+        try {
+            return Locale::tryFrom((string) config(
+                'tafer.routing.default_locale',
+                config('app.locale', Locale::English->value),
+            ))
+                ?? Locale::English;
+        } catch (\Throwable) {
+            return Locale::English;
+        }
     }
 }

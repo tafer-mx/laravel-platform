@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Log;
 use Storyblok\Api\Domain\Value\Uuid;
 use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Contracts\StoryblokGateway;
+use TAFER\Core\Enums\Locale;
+use TAFER\Core\Enums\Resort;
 use TAFER\Core\Middlewares\ResolveRequestCtx;
 use TAFER\Core\Services\StoryblokContextResolver;
 
@@ -84,22 +86,24 @@ class StoryblokLinkResolver
 
         // Priority 2: url field (external links entered manually)
         if ($link['url'] ?? null) {
-            return self::normalizeExternal($link['url']);
+            $url = self::normalizeExternal($link['url']);
+
+            return self::sierraPublicUrl($url) ?? $url;
         }
 
         // Priority 3: story.url (resolved by Storyblok API)
         if ($link['story']['url'] ?? null) {
-            return self::toPublicUrl('/'.$link['story']['url']);
+            return self::toPublicUrl($link['story']['url']);
         }
 
         // Priority 4: story.full_slug
         if ($link['story']['full_slug'] ?? null) {
-            return self::toPublicUrl('/'.$link['story']['full_slug']);
+            return self::toPublicUrl($link['story']['full_slug']);
         }
 
         // Priority 5: cached_url (fallback, may be outdated per Storyblok docs)
         if ($link['cached_url'] ?? null) {
-            return self::toPublicUrl('/'.trim($link['cached_url']));
+            return self::toPublicUrl(trim($link['cached_url']));
         }
 
         // Priority 6: Use pre-resolved links or fetch by UUID as last resort
@@ -107,11 +111,11 @@ class StoryblokLinkResolver
             $uuid = $link['id'];
 
             if (isset(self::$resolvedLinks[$uuid]['url'])) {
-                return self::toPublicUrl('/'.self::$resolvedLinks[$uuid]['url']);
+                return self::toPublicUrl(self::$resolvedLinks[$uuid]['url']);
             }
 
             if (isset(self::$resolvedLinks[$uuid]['slug'])) {
-                return self::toPublicUrl('/'.self::$resolvedLinks[$uuid]['slug']);
+                return self::toPublicUrl(self::$resolvedLinks[$uuid]['slug']);
             }
 
             return self::resolveByUuid($uuid, $lang);
@@ -141,7 +145,7 @@ class StoryblokLinkResolver
                 ->story;
 
             if ($story && ($story['full_slug'] ?? null)) {
-                $url = self::toPublicUrl('/'.$story['full_slug']);
+                $url = self::toPublicUrl($story['full_slug']);
 
                 Cache::put($cacheKey, $url, self::CACHE_TTL);
 
@@ -184,6 +188,10 @@ class StoryblokLinkResolver
      */
     private static function toPublicUrl(string $url): string
     {
+        if (($sierraUrl = self::sierraPublicUrl($url)) !== null) {
+            return $sierraUrl;
+        }
+
         try {
             $ctx = app(RequestCtx::class);
             $rawUrl = ltrim(trim($url), '/');
@@ -215,6 +223,43 @@ class StoryblokLinkResolver
 
             return $url;
         }
+    }
+
+    /** Return null for other resorts so their existing URL rules remain unchanged. */
+    private static function sierraPublicUrl(string $url): ?string
+    {
+        try {
+            $ctx = app(RequestCtx::class);
+            if ($ctx->resort !== Resort::SierraLago || ! isset($ctx->locale)) {
+                return null;
+            }
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($url === '' || preg_match('#^(?:[a-z][a-z0-9+.-]*:|//|[?\#])#i', $url)) {
+            return self::normalizeExternal($url);
+        }
+
+        // Keep query strings and anchors verbatim; normalize only complete leading segments.
+        [$path, $suffix] = array_pad(preg_split('/(?=[?#])/', $url, 2), 2, '');
+        $path = ltrim($path, '/');
+        $path = preg_replace('#^(?:(?:es|en)(?:/|$))+#', '', $path);
+        $path = preg_replace('#^brands/sierra-lago(?:/|$)#', '', $path);
+        $path = preg_replace('#^(?:(?:es|en)(?:/|$))+#', '', $path);
+
+        // Files and technical endpoints do not use page-language prefixes.
+        if (preg_match('#^(?:api|download|build|storage|json)(?:/|$)|\.[^/]+$#', $path)) {
+            return $url;
+        }
+
+        if (trim($path, '/') === 'home-sierra-lago') {
+            $path = '';
+        }
+
+        $prefix = $ctx->locale === Locale::English ? '/en' : '';
+
+        return ($prefix.($path === '' ? '' : '/'.$path) ?: '/').$suffix;
     }
 
     /**
