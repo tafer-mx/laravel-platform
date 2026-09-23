@@ -20,6 +20,12 @@ class ResolveRequestCtx
 
     public function handle(Request $request, Closure $next): Response
     {
+        if (config('tafer.routing.default_locale') === null) {
+            config([
+                'tafer.routing.default_locale' => config('app.locale', 'en'),
+            ]);
+        }
+
         $segments = $request->segments();
         $locale = RequestCtxSupport::getLocaleBySegments($segments);
 
