@@ -297,3 +297,20 @@ it('handles null values in normalization gracefully', function () {
     expect($context->get('link'))->toBeNull()
         ->and($context->get('alt_text'))->toBeNull();
 });
+
+it('normalizes activities-data renamed fields', function () {
+    $cardImage = ['filename' => 'https://a.storyblok.com/activity.jpg'];
+    $story = [
+        'content' => [
+            'component' => 'activities-data',
+            'title' => 'Una noche con el cosmos',
+            'activity_category' => 'night-activities',
+            'card_image' => $cardImage,
+        ],
+    ];
+
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
+
+    expect($context->get('category'))->toBe('night-activities')
+        ->and($context->get('image'))->toBe($cardImage);
+});
