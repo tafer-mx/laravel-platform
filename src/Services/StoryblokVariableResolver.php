@@ -41,21 +41,66 @@ class StoryblokVariableResolver
             self::VARIABLE_PATTERN,
             function ($matches) use ($context) {
                 $variableName = $matches[1];
-                $value = $context->get($variableName);
 
-                // Solo usar valores escalares (string, int, float, bool)
-                if ($value === null || ! is_scalar($value)) {
-                    return '';
-                }
-
-                // Convertir a string
-                return (string) $value;
+                return $this->stringValue($context->get($variableName));
             },
             $text
         );
 
         // Limpiar el resultado
         return $this->cleanupText($resolved);
+    }
+
+    /**
+     * Convierte el valor del contexto en texto para la variable
+     *
+     * Texto, números y booleanos se imprimen tal cual. Los campos richtext de Storyblok
+     * (type "doc") se convierten a texto plano; sin esto {{ description }} sale vacío.
+     */
+    private function stringValue(mixed $value): string
+    {
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (is_array($value) && ($value['type'] ?? null) === 'doc') {
+            return $this->richTextValue($value);
+        }
+
+        return '';
+    }
+
+    /**
+     * Extrae el texto plano de un nodo richtext
+     */
+    private function richTextValue(array $node): string
+    {
+        $type = $node['type'] ?? null;
+
+        if ($type === 'text') {
+            return is_string($node['text'] ?? null) ? $node['text'] : '';
+        }
+
+        if ($type === 'hard_break') {
+            return ' ';
+        }
+
+        // Un nodo puede tener otros nodos dentro ('content'), que a su vez pueden tener más.
+        // Se llama a esta misma función con cada hijo hasta llegar a los 'text'. Ej:
+        //   párrafo -> [text "Súper", text "bien"]  =>  $children = ["Súper", "bien"]
+        //   doc -> [párrafo, párrafo]               =>  $children = ["Súperbien", "Otro"]
+        $children = [];
+
+        foreach ($node['content'] ?? [] as $child) {
+            if (is_array($child)) {
+                $children[] = $this->richTextValue($child);
+            }
+        }
+
+        // Dentro de un párrafo van pegados ("Súper" + "bien"); entre párrafos, con espacio
+        $isLine = in_array($type, ['paragraph', 'heading'], true);
+
+        return implode($isLine ? '' : ' ', $children);
     }
 
     /**

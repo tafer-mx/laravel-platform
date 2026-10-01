@@ -267,6 +267,56 @@ it('ignores non-scalar values', function () {
     expect($result)->toBe('CONTENT');
 });
 
+it('resolves Storyblok rich text as plain text', function () {
+    $resolver = new StoryblokVariableResolver();
+    $context = new StoryblokBlockContext(
+        content: [
+            'component' => 'activities-data',
+            'description' => [
+                'type' => 'doc',
+                'content' => [[
+                    'type' => 'paragraph',
+                    'content' => [
+                        ['type' => 'text', 'text' => 'Uso'],
+                        ['type' => 'hard_break'],
+                        ['type' => 'text', 'text' => 'del lago'],
+                    ],
+                ]],
+            ],
+        ]
+    );
+
+    expect($resolver->resolve('{{ description }}', $context))->toBe('Uso del lago');
+});
+
+it('joins rich text fragments without extra spaces and separates paragraphs', function () {
+    $resolver = new StoryblokVariableResolver();
+    $context = new StoryblokBlockContext(
+        content: [
+            'component' => 'activities-data',
+            'description' => [
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => 'paragraph',
+                        'content' => [
+                            ['type' => 'text', 'text' => 'Súper'],
+                            ['type' => 'text', 'text' => 'bien', 'marks' => [['type' => 'bold']]],
+                            ['type' => 'text', 'text' => '.'],
+                        ],
+                    ],
+                    [
+                        'type' => 'paragraph',
+                        'content' => [['type' => 'text', 'text' => 'Segundo párrafo']],
+                    ],
+                ],
+            ],
+        ]
+    );
+
+    expect($resolver->resolve('{{ description }}', $context))->toBe('Súperbien. Segundo párrafo');
+});
+
 it('converts numeric values to string', function () {
     $resolver = new StoryblokVariableResolver();
     $context = new StoryblokBlockContext(
