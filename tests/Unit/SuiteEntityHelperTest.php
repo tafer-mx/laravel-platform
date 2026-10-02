@@ -54,6 +54,25 @@ it('maps a suites-data story into a normalized suite payload', function () {
                     'image_icon' => ['filename' => 'ignored.svg'],
                 ],
             ],
+            'gallery' => [
+                [
+                    'component' => 'basic-image-responsive',
+                    'image_desktop' => [
+                        'filename' => 'https://example.com/suite.jpg',
+                        'alt' => 'Suite photo',
+                    ],
+                    'image_mobile' => [
+                        'filename' => 'https://example.com/suite-mobile.jpg',
+                    ],
+                ],
+                [
+                    'component' => 'basic-image-responsive',
+                    'image_desktop' => [
+                        'filename' => '   ',
+                        'alt' => 'Empty editor slot',
+                    ],
+                ],
+            ],
             'suite_link' => ['url' => '/suites/one-bedroom'],
         ],
     ];
@@ -69,7 +88,24 @@ it('maps a suites-data story into a normalized suite payload', function () {
         'tags' => ['beds-2', 'garden-view'],
     ])->and($suite['amenities'])->toBe([
         ['label' => 'Balcony', 'icon' => 'balcony.svg'],
+    ])->and($suite['gallery'])->toBe([
+        [
+            'image' => 'https://example.com/suite.jpg',
+            'alt' => 'Suite photo',
+            'image_mobile' => 'https://example.com/suite-mobile.jpg',
+        ],
     ]);
+});
+
+it('returns an empty gallery when the story has no gallery blocks', function () {
+    $suite = SuiteEntityHelper::fromStory([
+        'name' => 'Suite',
+        'content' => [
+            'component' => 'suites-data',
+        ],
+    ]);
+
+    expect($suite['gallery'])->toBe([]);
 });
 
 it('exposes the virtual tour url in the suite payload', function () {
