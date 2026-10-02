@@ -182,6 +182,55 @@ it('normalizes suites-data component', function () {
         ]);
 });
 
+it('normalizes suites-data gallery blocks and drops empty images', function () {
+    $story = [
+        'content' => [
+            'component' => 'suites-data',
+            'gallery' => [
+                [
+                    'component' => 'basic-image-responsive',
+                    'image_desktop' => [
+                        'filename' => 'https://example.com/suite-1.jpg',
+                        'alt' => 'Suite living room',
+                    ],
+                    'image_mobile' => [
+                        'filename' => 'https://example.com/suite-1-mobile.jpg',
+                    ],
+                ],
+                [
+                    'component' => 'basic-image-responsive',
+                    'image_desktop' => [
+                        'filename' => '',
+                        'alt' => 'Empty slot',
+                    ],
+                ],
+                [
+                    'component' => 'basic-image-responsive',
+                    'image_desktop' => [
+                        'alt' => 'Missing filename',
+                    ],
+                ],
+                [
+                    'component' => 'legacy-image',
+                    'image_desktop' => [
+                        'filename' => 'https://example.com/ignored.jpg',
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
+
+    expect($context->get('gallery'))->toBe([
+        [
+            'image' => 'https://example.com/suite-1.jpg',
+            'alt' => 'Suite living room',
+            'image_mobile' => 'https://example.com/suite-1-mobile.jpg',
+        ],
+    ]);
+});
+
 it('ignores amenity blocks with a different component', function () {
     $story = [
         'content' => [

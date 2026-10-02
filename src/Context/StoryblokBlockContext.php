@@ -21,6 +21,7 @@ final class StoryblokBlockContext
         ],
         'suites-data' => [
             'title' => 'title',
+            'description' => 'description',
             'image' => 'image',
             'beds' => 'beds',
             'view' => 'view',
@@ -38,6 +39,16 @@ final class StoryblokBlockContext
                     'image_icon.filename' => 'icon',
                     'text' => 'label',
                     'alt' => 'alt_text',
+                ],
+            ],
+            'gallery' => [
+                'target' => 'gallery',
+                'component' => 'basic-image-responsive',
+                'required' => ['image'],
+                'map' => [
+                    'image_desktop.filename' => 'image',
+                    'image_desktop.alt' => 'alt',
+                    'image_mobile.filename' => 'image_mobile',
                 ],
             ],
         ],
@@ -145,13 +156,28 @@ final class StoryblokBlockContext
                     $value = data_get($item, $itemSource);
 
                     if ($value !== null) {
-                        $normalizedItem[$itemTarget] = $value;
+                        $normalizedItem[$itemTarget] = is_string($value) ? trim($value) : $value;
                     }
                 }
 
-                if ($normalizedItem !== []) {
-                    $normalizedItems[] = $normalizedItem;
+                if ($normalizedItem === []) {
+                    continue;
                 }
+
+                $hasMissingRequired = false;
+
+                foreach ($config['required'] ?? [] as $requiredKey) {
+                    if (trim((string) ($normalizedItem[$requiredKey] ?? '')) === '') {
+                        $hasMissingRequired = true;
+                        break;
+                    }
+                }
+
+                if ($hasMissingRequired) {
+                    continue;
+                }
+
+                $normalizedItems[] = $normalizedItem;
             }
 
             $normalized[$config['target']] = $normalizedItems;
