@@ -28,6 +28,14 @@ final class StoryblokBlockContext
             'suite_link' => 'link',
             'virtual_tour_url' => 'virtual_tour_url',
         ],
+        'activities-data' => [
+            'title' => 'title',
+            'description' => 'description',
+            'category' => 'category',
+            'activity_category' => 'category',
+            'card_image' => 'image',
+            'link' => 'link',
+        ],
     ];
 
     private const COLLECTION_NORMALIZATION_MAP = [
