@@ -97,6 +97,62 @@ it('maps a suites-data story into a normalized suite payload', function () {
     ]);
 });
 
+it('reads a textarea description and a leftover richtext description', function () {
+    $textarea = SuiteEntityHelper::fromStory([
+        'name' => 'Suite',
+        'content' => [
+            'component' => 'suites-data',
+            'description' => '  Cabaña frente al lago  ',
+        ],
+    ]);
+
+    $richtext = SuiteEntityHelper::fromStory([
+        'name' => 'Suite',
+        'content' => [
+            'component' => 'suites-data',
+            'description' => [
+                'type' => 'doc',
+                'content' => [
+                    [
+                        'type' => 'paragraph',
+                        'content' => [
+                            ['type' => 'text', 'text' => 'Cabaña frente al lago'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    expect($textarea['description'])->toBe('Cabaña frente al lago')
+        ->and($richtext['description'])->toBe('Cabaña frente al lago');
+});
+
+it('drops an amenity whose label is not text and keeps the rest', function () {
+    $suite = SuiteEntityHelper::fromStory([
+        'name' => 'Suite',
+        'content' => [
+            'component' => 'suites-data',
+            'amenities' => [
+                [
+                    'component' => 'basic-amenetie-icon',
+                    'text' => ['filename' => 'https://example.com/icon.svg'],
+                    'image_icon' => ['filename' => 'wifi.svg'],
+                ],
+                [
+                    'component' => 'basic-amenetie-icon',
+                    'text' => 'Alberca',
+                    'image_icon' => ['filename' => 'pool.svg'],
+                ],
+            ],
+        ],
+    ]);
+
+    expect($suite['amenities'])->toBe([
+        ['label' => 'Alberca', 'icon' => 'pool.svg'],
+    ]);
+});
+
 it('returns an empty gallery when the story has no gallery blocks', function () {
     $suite = SuiteEntityHelper::fromStory([
         'name' => 'Suite',

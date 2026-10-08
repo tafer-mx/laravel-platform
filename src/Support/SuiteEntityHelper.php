@@ -38,8 +38,8 @@ final class SuiteEntityHelper
         return [
             'uuid' => is_string($story['uuid'] ?? null) ? $story['uuid'] : null,
             'name' => trim((string) ($story['name'] ?? '')),
-            'title' => trim((string) ($context->get('title') ?? $story['name'] ?? '')),
-            'description' => trim((string) ($context->get('description') ?? '')),
+            'title' => self::plainText($context->get('title') ?? $story['name'] ?? ''),
+            'description' => self::plainText($context->get('description') ?? ''),
             'image' => $context->get('image'),
             'gallery' => array_values((array) ($context->get('gallery') ?? [])),
             'link' => $context->get('link'),
@@ -49,7 +49,7 @@ final class SuiteEntityHelper
             'amenities' => array_values(array_filter(
                 array_map(
                     static fn (array $a): array => [
-                        'label' => trim((string) ($a['label'] ?? '')),
+                        'label' => self::plainText($a['label'] ?? ''),
                         'icon' => $a['icon'] ?? null,
                     ],
                     array_filter((array) ($context->get('amenities') ?? []), 'is_array'),
@@ -164,6 +164,50 @@ final class SuiteEntityHelper
         }
 
         return $selected;
+    }
+
+    /**
+     * Texto plano para campos que el filtro imprime.
+     * Un textarea llega como string. Un richtext de Storyblok llega como
+     * array type "doc"; se extrae el texto para no tirar la página.
+     */
+    private static function plainText(mixed $value): string
+    {
+        if (is_string($value) || is_numeric($value)) {
+            return trim((string) $value);
+        }
+
+        if (is_array($value) && ($value['type'] ?? null) === 'doc') {
+            return trim(self::richTextValue($value));
+        }
+
+        return '';
+    }
+
+    /** Extrae el texto de un nodo richtext de Storyblok. */
+    private static function richTextValue(array $node): string
+    {
+        $type = $node['type'] ?? null;
+
+        if ($type === 'text') {
+            return is_string($node['text'] ?? null) ? $node['text'] : '';
+        }
+
+        if ($type === 'hard_break') {
+            return ' ';
+        }
+
+        $children = [];
+
+        foreach ($node['content'] ?? [] as $child) {
+            if (is_array($child)) {
+                $children[] = self::richTextValue($child);
+            }
+        }
+
+        $isLine = in_array($type, ['paragraph', 'heading'], true);
+
+        return implode($isLine ? '' : ' ', $children);
     }
 
     /** Convierte el valor crudo de camas a int positivo o null. */
