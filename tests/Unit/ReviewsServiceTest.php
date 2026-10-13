@@ -114,6 +114,26 @@ it('returns only visible five star reviews by hotel', function () {
     expect($request->getHeaderLine('Accept-Language'))->toBe('en');
 });
 
+it('requests and converts Sierra Lago reviews using SLPV', function () {
+    $history = [];
+    $service = makeReviewsServiceWithMock([
+        new Response(200, [], json_encode([
+            'data' => [fakeReviewPayload([
+                'brand' => 'SL',
+                'code' => 'SLPV',
+                'destination' => 'PV',
+            ])],
+        ])),
+    ], $history);
+
+    $reviews = $service->getByHotel(Resort::SierraLago->region(Location::Mascota), Locale::Spanish);
+
+    expect($history[0]['request']->getUri()->getPath())->toBe('/code/SLPV')
+        ->and($reviews)->toHaveCount(1)
+        ->and($reviews->first()->brand)->toBe(Resort::SierraLago)
+        ->and($reviews->first()->code)->toBe('SLPV');
+});
+
 it('returns only visible five star reviews by brand', function () {
     $history = [];
 
