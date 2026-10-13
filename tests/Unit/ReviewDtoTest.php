@@ -1,6 +1,8 @@
 <?php
 
 use TAFER\Core\Dto\ReviewDto;
+use TAFER\Core\Enums\Location;
+use TAFER\Core\Enums\Resort;
 use Tests\Support\Fixture;
 
 it('Must return a ReviewDto', function () {
@@ -69,4 +71,28 @@ it('Must not expose enum objects in array output', function () {
     expect($arrDto['language'])->toBe($rawReview['language'])
         ->and($arrDto['brand'])->toBe($rawReview['brand'])
         ->and($arrDto['destination'])->toBe($rawReview['destination']);
+});
+
+it('accepts the Sierra Lago review API destination through its Puerto Vallarta region alias', function () {
+    $rawReview = Fixture::getTestFixture('review-response.fixture.json')['en']['data'][0];
+    $rawReview['brand'] = 'SL';
+    $rawReview['code'] = 'SLPV';
+    $rawReview['destination'] = 'PV';
+
+    $dto = ReviewDto::fromArray($rawReview);
+
+    expect($dto->brand)->toBe(Resort::SierraLago)
+        ->and($dto->code)->toBe('SLPV')
+        ->and($dto->destination)->toBe(Location::PuertoVallarta)
+        ->and(Resort::SierraLago->regionCode(Location::Mascota))->toBe('SLPV')
+        ->and(Resort::SierraLago->regionCode(Location::PuertoVallarta))->toBe('SLPV');
+});
+
+it('rejects unrelated destinations for Sierra Lago reviews', function () {
+    $rawReview = Fixture::getTestFixture('review-response.fixture.json')['en']['data'][0];
+    $rawReview['brand'] = 'SL';
+    $rawReview['code'] = 'SLPV';
+    $rawReview['destination'] = 'CN';
+
+    expect(fn () => ReviewDto::fromArray($rawReview))->toThrow(InvalidArgumentException::class);
 });

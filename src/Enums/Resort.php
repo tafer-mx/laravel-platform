@@ -72,7 +72,8 @@ enum Resort: string
             ],
 
             self::SierraLago => [
-                new ResortRegion(Location::Mascota, 'SLMS'),
+                new ResortRegion(Location::Mascota, 'SLPV'),
+                new ResortRegion(Location::PuertoVallarta, 'SLPV'), // Reviews API destination alias.
             ],
         };
     }
