@@ -12,7 +12,9 @@ final class StoryblokBlockContext
         ],
         'offer_data' => [
             'general_offer_link' => 'link',
+            'image' => 'image',
             'general_offer_title' => 'offer_title',
+            'description' => 'description',
             'discount' => 'discount',
             'status' => 'status',
             'validity_activation_type' => 'activation',
@@ -21,6 +23,7 @@ final class StoryblokBlockContext
         ],
         'suites-data' => [
             'title' => 'title',
+            'subtitle' => 'subtitle',
             'description' => 'description',
             'image' => 'image',
             'beds' => 'beds',
