@@ -49,7 +49,8 @@
     "require-dev": {
         "pestphp/pest": "^4.7",
         "orchestra/testbench": "^10.11",
-        "laravel/pint": "^1.29"
+        "laravel/pint": "^1.29",
+        "giorgiosironi/eris": "1.2.1"
     },
     "config": {
         "allow-plugins": {

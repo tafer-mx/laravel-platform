@@ -12,6 +12,12 @@ return [
         ],
     ],
 
+    'geo' => [
+        'header' => 'CF-IPCountry',
+        'allow_override' => env('GEO_ALLOW_OVERRIDE', env('APP_DEBUG', false)),
+        'override_query_param' => 'country',
+    ],
+
     'storyblok' => [
         'base_uri' => 'https://api.storyblok.com',
         'token' => '',
