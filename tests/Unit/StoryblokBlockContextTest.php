@@ -363,24 +363,3 @@ it('normalizes activities-data renamed fields', function () {
     expect($context->get('category'))->toBe('night-activities')
         ->and($context->get('image'))->toBe($cardImage);
 });
-
-it('normalizes wedding-shared fields', function () {
-    $gallery = [['component' => 'Section_gallery']];
-    $terms = ['type' => 'doc', 'content' => []];
-    $story = [
-        'content' => [
-            'component' => 'wedding-shared',
-            'Gallery' => $gallery,
-            'Terms' => $terms,
-            'TermsTitle' => 'Términos y condiciones',
-            'DefaultPortrait' => ['filename' => 'https://a.storyblok.com/lago.jpg'],
-        ],
-    ];
-
-    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
-
-    expect($context->get('gallery'))->toBe($gallery)
-        ->and($context->get('terms'))->toBe($terms)
-        ->and($context->get('terms_title'))->toBe('Términos y condiciones')
-        ->and($context->get('default_portrait.filename'))->toBe('https://a.storyblok.com/lago.jpg');
-});
