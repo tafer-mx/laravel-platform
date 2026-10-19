@@ -39,6 +39,15 @@ final class StoryblokBlockContext
             'card_image' => 'image',
             'link' => 'link',
         ],
+        'wedding-shared' => [
+            'DefaultPortrait' => 'default_portrait',
+            'Gallery' => 'gallery',
+            'Terms' => 'terms',
+            'TermsEyebrow' => 'terms_eyebrow',
+            'TermsTitle' => 'terms_title',
+            'TermsIntro' => 'terms_intro',
+            'Footer' => 'footer',
+        ],
     ];
 
     private const COLLECTION_NORMALIZATION_MAP = [
