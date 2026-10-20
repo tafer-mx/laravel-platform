@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Orchestra\Testbench\TestCase;
@@ -39,27 +40,58 @@ it('renders the consumer unknown component when there are no valid bloks', funct
     expect($html)->toContain('data-component="unknown"');
 });
 
-it('keeps the legacy downloader response and filename behavior', function () {
+it('downloads a PDF from allowed Storyblok host with clean filename', function () {
     Route::get('/download-test', DownloadController::class);
 
-    // This non-HTTP stream intentionally proves compatibility with the legacy
-    // implementation. The controller documents that arbitrary schemes are a
-    // known security flaw to remove in a dedicated follow-up.
+    Http::fake([
+        'https://a.storyblok.com/*' => Http::response('PDF binary stream content', 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Length' => '25',
+        ]),
+    ]);
+
     $response = $this->get('/download-test?'.http_build_query([
-        'url' => 'data://text/plain,PDF content',
+        'url' => 'https://a.storyblok.com/f/12345/menu-summer.pdf',
         'filename' => 'menu summer',
     ]));
 
     $response
         ->assertOk()
-        ->assertHeader('Content-Type', 'application/octet-stream')
-        ->assertHeader('Content-Disposition', 'attachment; filename="menu_summer.pdf"')
-        ->assertHeader('X-Content-Type-Options', 'nosniff')
-        ->assertSeeText('PDF content');
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('Content-Disposition', 'attachment; filename=menu_summer.pdf')
+        ->assertHeader('X-Content-Type-Options', 'nosniff');
+
+    expect($response->streamedContent())->toBe('PDF binary stream content');
 });
 
 it('rejects downloader requests without a URL', function () {
     Route::get('/download-test', DownloadController::class);
 
     $this->get('/download-test')->assertStatus(400);
+});
+
+it('rejects non-HTTPS schemes', function () {
+    Route::get('/download-test', DownloadController::class);
+
+    $this->get('/download-test?url='.urlencode('http://a.storyblok.com/test.pdf'))->assertStatus(404);
+    $this->get('/download-test?url='.urlencode('data://text/plain,hello'))->assertStatus(404);
+    $this->get('/download-test?url='.urlencode('file:///etc/passwd'))->assertStatus(404);
+});
+
+it('rejects unapproved external hosts', function () {
+    Route::get('/download-test', DownloadController::class);
+
+    $this->get('/download-test?url='.urlencode('https://malicious-site.com/evil.pdf'))->assertStatus(404);
+    $this->get('/download-test?url='.urlencode('https://a.storyblok.com.attacker.com/evil.pdf'))->assertStatus(404);
+});
+
+it('returns 404 cleanly when upstream resource is missing without exposing errors', function () {
+    Route::get('/download-test', DownloadController::class);
+
+    Http::fake([
+        'https://a.storyblok.com/*' => Http::response('Not Found', 404),
+    ]);
+
+    $this->get('/download-test?url='.urlencode('https://a.storyblok.com/f/missing.pdf'))
+        ->assertStatus(404);
 });
