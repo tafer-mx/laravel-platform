@@ -59,4 +59,21 @@ return [
     'suites' => [
         'entities_path' => 'entities/suites',
     ],
+
+    /*
+    | PDF download security configuration
+    | lista de host, timeouts y tamaño maximo de descarga
+    */
+    'download' => [
+        'allowed_hosts' => [
+            'a.storyblok.com',
+        ],
+        'allowed_host_suffixes' => [
+            '.storyblok.com',
+        ],
+        'max_size_bytes' => 25 * 1024 * 1024, // 25 MB
+        'timeout_seconds' => 10,
+        'connect_timeout_seconds' => 3,
+
+    ],
 ];
