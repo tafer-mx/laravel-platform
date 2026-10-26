@@ -38,6 +38,12 @@ final class StoryblokBlockContext
             'activity_category' => 'category',
             'card_image' => 'image',
             'link' => 'link',
+            'duration' => 'duration',
+            'location' => 'location',
+            'schedule' => 'schedule',
+            'clothing' => 'clothing',
+            'recommendations' => 'recommendations',
+            'cost' => 'cost',
         ],
         'wedding-shared' => [
             'DefaultPortrait' => 'default_portrait',
