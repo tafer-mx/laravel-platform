@@ -363,3 +363,22 @@ it('normalizes activities-data renamed fields', function () {
     expect($context->get('category'))->toBe('night-activities')
         ->and($context->get('image'))->toBe($cardImage);
 });
+
+it('keeps the activities-data modal fields', function () {
+    $story = [
+        'content' => [
+            'component' => 'activities-data',
+            'title' => 'Una noche con el cosmos',
+            'duration' => '30 minutos',
+            'schedule' => '8:00 pm',
+            'cost' => 'Gratuito',
+        ],
+    ];
+
+    $context = StoryblokBlockContext::empty()->withResolvedStory($story);
+
+    expect($context->get('duration'))->toBe('30 minutos')
+        ->and($context->get('schedule'))->toBe('8:00 pm')
+        ->and($context->get('cost'))->toBe('Gratuito')
+        ->and($context->get('clothing'))->toBeNull();
+});
