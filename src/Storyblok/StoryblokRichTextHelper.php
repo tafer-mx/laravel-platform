@@ -2,6 +2,7 @@
 
 namespace TAFER\Core\Storyblok;
 
+use Illuminate\Support\Facades\Blade;
 use Storyblok\Tiptap\Extension\Storyblok;
 use Storyblok\Tiptap\Node\BulletList;
 use Storyblok\Tiptap\Node\OrderedList;
@@ -16,9 +17,10 @@ class StoryblokRichTextHelper
     /**
      * Render Storyblok Rich Text to HTML using Tiptap.
      *
-     * @param  array|null  $node
+     * @param  array<string, mixed>|null  $node
+     * @param  (callable(array<string, mixed>): string)|null  $blokRenderer
      */
-    public static function render($node): string
+    public static function render($node, ?callable $blokRenderer = null): string
     {
         if (! is_array($node)) {
             return '';
@@ -30,7 +32,13 @@ class StoryblokRichTextHelper
                     'override_extensions' => [
                         CustomLink::$name => new CustomLink,
                     ],
-                    'disable_extensions' => ['bullet_list', 'heading', 'ordered_list', 'blok'],
+                    'disable_extensions' => ['bullet_list', 'heading', 'ordered_list'],
+                    'blokOptions' => [
+                        'renderer' => $blokRenderer ?? static fn (array $blok): string => Blade::render(
+                            '<x-storyblok._resolver :bloks="$bloks" />',
+                            ['bloks' => [$blok]],
+                        ),
+                    ],
                 ]),
                 new CustomTextStyle,
                 new CustomHeading,
