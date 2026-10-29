@@ -79,6 +79,34 @@ it('renders rich text links with Villa Palmar link policies', function () {
         ->toContain('rel="noopener noreferrer nofollow"');
 });
 
+it('renders embedded Storyblok blocks through the configured block renderer', function () {
+    $node = [
+        'type' => 'doc',
+        'content' => [[
+            'type' => 'blok',
+            'attrs' => [
+                'body' => [[
+                    'component' => 'basic-heading',
+                    '_uid' => 'embedded-heading-1',
+                    'heading' => 'A heading inside rich text',
+                ]],
+            ],
+        ]],
+    ];
+
+    $renderedBloks = [];
+    $html = StoryblokRichTextHelper::render($node, static function (array $blok) use (&$renderedBloks): string {
+        $renderedBloks[] = $blok;
+
+        return '<h2>'.e($blok['heading']).'</h2>';
+    });
+
+    expect($html)->toContain('<h2>A heading inside rich text</h2>')
+        ->and($renderedBloks)->not->toBeEmpty()
+        ->and($renderedBloks[0]['component'])->toBe('basic-heading')
+        ->and($renderedBloks[0]['_uid'])->toBe('embedded-heading-1');
+});
+
 it('evaluates conditional offers across midnight', function () {
     Carbon::setTestNow(Carbon::parse('2026-08-10 23:00:00', 'America/Mexico_City'));
 
