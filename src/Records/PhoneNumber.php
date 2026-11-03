@@ -34,6 +34,28 @@ readonly class PhoneNumber
     }
 
     /**
+     * Crea un teléfono a partir del formato en array que usa el frontend.
+     *
+     * @param  mixed  $data  Array con `url` (tel:+18009843015) y `button_text`.
+     * @return self|null Teléfono, o null si los datos están incompletos.
+     */
+    public static function tryFromArray(mixed $data): ?self
+    {
+        if (! is_array($data)
+            || ! is_string($data['url'] ?? null)
+            || ! is_string($data['button_text'] ?? null)
+            || $data['url'] === ''
+        ) {
+            return null;
+        }
+
+        return new self(
+            number: preg_replace('/^tel:/i', '', $data['url']),
+            buttonText: $data['button_text'],
+        );
+    }
+
+    /**
      * Convert the phone number to the array format expected by the frontend.
      *
      * @return array{
