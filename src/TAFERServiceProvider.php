@@ -3,6 +3,7 @@
 namespace TAFER\Core;
 
 use GuzzleHttp\Client;
+use Illuminate\Contracts\Cookie\QueueingFactory as CookieQueue;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
@@ -14,11 +15,14 @@ use Storyblok\Api\StoryblokClient;
 use Storyblok\Api\StoryblokClientInterface;
 use TAFER\Core\Context\RequestCtx;
 use TAFER\Core\Context\RequestCtxRelation;
+use TAFER\Core\Contracts\PhoneResolver;
 use TAFER\Core\Contracts\ReviewClient;
 use TAFER\Core\Contracts\StoryblokCache;
 use TAFER\Core\Contracts\StoryblokCacheInvalidator;
 use TAFER\Core\Contracts\StoryblokGateway;
 use TAFER\Core\Enums\Locale;
+use TAFER\Core\Phones\ConfigPhoneResolver;
+use TAFER\Core\Phones\PartnerTracker;
 use TAFER\Core\Services\CachedStoryblokService;
 use TAFER\Core\Services\ReviewsService;
 use TAFER\Core\Services\StoryblokContextResolver;
@@ -30,7 +34,6 @@ use TAFER\Core\Storyblok\StoryblokCacheKey;
 use TAFER\Core\Storyblok\StoryblokCachePolicy;
 use TAFER\Core\Storyblok\StoryblokRequestFactory;
 use TAFER\Core\Storyblok\StoryblokWebhookInvalidator;
-use TAFER\Core\View\Components\PhoneDirectory;
 use TAFER\Core\View\Components\StoryblokResolver;
 
 class TAFERServiceProvider extends ServiceProvider
@@ -155,6 +158,30 @@ class TAFERServiceProvider extends ServiceProvider
         $this->app->singleton(StoryblokVariableResolver::class);
 
         $this->app->scoped(SuitesEntityService::class);
+
+        // Teléfonos de reservaciones: el mapeo vive en el config de cada sitio (tafer.phones.config_key)
+        $this->app->scoped(PartnerTracker::class, fn ($app) => new PartnerTracker(
+            cookies: $app->make(CookieQueue::class),
+            queryParam: config('tafer.phones.partner.query_param', 'partner'),
+            cookieName: config('tafer.phones.partner.cookie', 'partner_id'),
+            cookieMinutes: (int) config('tafer.phones.partner.cookie_minutes', 43200),
+        ));
+
+        $this->app->scoped(PhoneResolver::class, function ($app) {
+            $defaultLocale = $this->phoneDefaultLocale();
+
+            return new ConfigPhoneResolver(
+                phones: (array) config(config('tafer.phones.config_key', 'tollfree'), []),
+                partners: $app->make(PartnerTracker::class),
+                defaultLocale: $defaultLocale,
+                partnerLocales: $this->phonePartnerLocales($defaultLocale),
+                locationScoped: (bool) config('tafer.phones.location_scoped', false),
+                timezone: $this->phoneTimezone(),
+                timeOverrideParam: $this->phoneTimeOverrideAllowed()
+                    ? config('tafer.phones.schedules.time_override_param', 'phone_time')
+                    : null,
+            );
+        });
     }
 
     public function boot(): void
@@ -167,9 +194,55 @@ class TAFERServiceProvider extends ServiceProvider
 
         // Class Components
         // https://laravel.com/docs/13.x/packages#view-components
-        Blade::component('tafer-phone-directory', PhoneDirectory::class);
         Blade::component('storyblok._resolver', StoryblokResolver::class);
 
+    }
+
+    private function phoneDefaultLocale(): Locale
+    {
+        return Locale::tryFrom((string) (
+            config('tafer.phones.default_locale')
+                ?? config('tafer.storyblok.default_locale', Locale::English->value)
+        )) ?? Locale::English;
+    }
+
+    /**
+     * Indica si ?phone_time=HH:MM puede forzar la hora de los horarios. Por defecto solo en el entorno local.
+     */
+    private function phoneTimeOverrideAllowed(): bool
+    {
+        $allowed = config('tafer.phones.schedules.allow_time_override');
+
+        return $allowed === null ? $this->app->isLocal() : (bool) $allowed;
+    }
+
+    /**
+     * Zona horaria de los horarios de teléfonos. Cada sitio puede definir resort_timezone(), como espera OfferValidityHelper.
+     */
+    private function phoneTimezone(): string
+    {
+        $timezone = config('tafer.phones.schedules.timezone')
+            ?? (function_exists('resort_timezone') ? resort_timezone() : null)
+            ?? config('app.timezone');
+
+        return is_string($timezone) && $timezone !== '' ? $timezone : 'UTC';
+    }
+
+    /**
+     * @return list<Locale>
+     */
+    private function phonePartnerLocales(Locale $defaultLocale): array
+    {
+        $locales = config('tafer.phones.partner_locales');
+
+        if (! is_array($locales)) {
+            return [$defaultLocale];
+        }
+
+        return array_values(array_filter(array_map(
+            fn (mixed $locale): ?Locale => $locale instanceof Locale ? $locale : Locale::tryFrom((string) $locale),
+            $locales,
+        )));
     }
 
     private function requiredConfig(string $key): string
