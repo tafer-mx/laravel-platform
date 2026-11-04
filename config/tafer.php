@@ -61,6 +61,37 @@ return [
     ],
 
     /*
+    | Teléfonos de reservaciones (TAFER\Core\Contracts\PhoneResolver).
+    | El mapa de números vive en cada sitio, en `config_key` (por defecto config/tollfree.php).
+    |
+    | - default_locale: idioma principal del sitio, usado como fallback. null = tafer.storyblok.default_locale.
+    | - partner_locales: idiomas en los que aplican los números de partner. null = [default_locale].
+    | - location_scoped: true si el mapa está agrupado por location ('cancun' => [...]).
+    */
+    'phones' => [
+        'config_key' => 'tollfree',
+        'default_locale' => null,
+        'partner_locales' => null,
+        'location_scoped' => false,
+        'partner' => [
+            'query_param' => 'partner',
+            'cookie' => 'partner_id',
+            'cookie_minutes' => 43200, // 30 días
+        ],
+        /*
+        | Números por horario (`schedules` en el mapa de números, ej: Bookline fuera de horario).
+        | - timezone: para horarios sin zona horaria propia. null = resort_timezone() o app.timezone.
+        | - allow_time_override: permite forzar la hora para QA con ?{time_override_param}=23:30.
+        |   null = solo en el entorno local (APP_ENV=local). Por defecto nunca se activa en producción.
+        */
+        'schedules' => [
+            'timezone' => null,
+            'allow_time_override' => null,
+            'time_override_param' => 'phone_time',
+        ],
+    ],
+
+    /*
     | PDF download security configuration
     | lista de host, timeouts y tamaño maximo de descarga
     */
