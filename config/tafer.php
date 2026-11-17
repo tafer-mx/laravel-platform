@@ -92,6 +92,29 @@ return [
     ],
 
     /*
+    | Google Consent Mode v2 (componente <x-tafer::consent-mode />).
+    |
+    | - storage_key: clave de localStorage donde el banner guarda las preferencias del visitante.
+    | - wait_for_update: ms que Google espera un `update` antes de usar el `default`. 0 = no enviar.
+    | - signals: señal de Google => categoría del banner que la controla (granted si la categoría es true).
+    | - always_granted: señales que siempre se conceden, sin depender de una categoría.
+    */
+    'consent' => [
+        'storage_key' => 'cookie-preferences-v1',
+        'wait_for_update' => 500,
+        'signals' => [
+            'analytics_storage' => 'analytics',
+            'ad_storage' => 'marketing',
+            'ad_user_data' => 'marketing',
+            'ad_personalization' => 'marketing',
+            'functionality_storage' => 'preferences',
+            'personalization_storage' => 'preferences',
+        ],
+        'always_granted' => [
+            'security_storage',
+        ],
+    ],
+    /*
     | PDF download security configuration
     | lista de host, timeouts y tamaño maximo de descarga
     */

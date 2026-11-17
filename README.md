@@ -299,6 +299,43 @@ centralizes the existing behavior before redesigning those APIs.
 
 ---
 
+## Google Consent Mode v2
+
+El paquete incluye el componente `<x-tafer::consent-mode />`, que centraliza las señales de Consent Mode v2 para todos los sitios.
+
+**Qué hace**
+
+- Envía `gtag('consent', 'default', ...)` leyendo las preferencias guardadas en `localStorage`. Si no hay nada guardado, deniega todo (salvo `security_storage`).
+- Expone `window.taferConsent.update(prefs)` para que el banner envíe la elección real del visitante.
+
+**Uso en el sitio**
+
+1. Colócalo en el `<head>`, **antes** de cargar GTM o cualquier otro script de Google:
+
+```blade
+<head>
+    <x-tafer::consent-mode />
+    ...
+</head>
+```
+
+2. En el banner, llama a `update` cada vez que el visitante guarda o se restaura su elección (`prefs` usa las categorías `analytics`, `marketing` y `preferences`):
+
+```js
+window.taferConsent?.update(prefs);
+```
+
+3. Elimina cualquier `consent default` o `consent update` propio del sitio (por ejemplo en `marketingLoader`).
+
+**Configuración** (`tafer.consent`, publicable con `--tag=tafer-config`)
+
+| Clave | Descripción |
+| --- | --- |
+| `storage_key` | Clave de `localStorage` con las preferencias (por defecto `cookie-preferences-v1`). |
+| `wait_for_update` | Milisegundos que Google espera un `update` (por defecto `500`, `0` desactiva el parámetro). |
+| `signals` | Mapa señal de Google => categoría del banner que la controla. |
+| `always_granted` | Señales siempre concedidas (por defecto `security_storage`). |
+
 ## Workflow & Releases
 
 ### Branch Strategy
